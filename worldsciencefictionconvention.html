@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第81届世界科幻大会 · 杨昀桦</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f6f3ec;
+    --panel: rgba(255, 255, 255, 0.9);
+    --panel-strong: rgba(255, 255, 255, 0.96);
+    --text: #171717;
+    --text-soft: rgba(23, 23, 23, 0.66);
+    --line: rgba(23, 23, 23, 0.1);
+    --grid: rgba(124, 116, 103, 0.18);
+    --accent: #c84c35;
+    --shadow-soft: 0 22px 60px rgba(34, 27, 20, 0.08);
+    --shadow-deep: 0 34px 96px rgba(28, 22, 16, 0.14);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(180deg, #f8f5ef 0%, #f4f0e8 100%);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  .grid-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size:
+      calc((100vw - 4rem) / 12) 100%,
+      100% 11.111vh;
+    background-position: 2rem 0, 0 0;
+    background-repeat: repeat-x, repeat-y;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .back-link,
+  .home-link {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .project-header {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+    align-items: end;
+    margin-bottom: 3rem;
+  }
+
+  .project-header h1 {
+    grid-column: 1 / span 7;
+    font-size: clamp(3rem, 7vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+
+  .project-meta {
+    grid-column: 9 / span 4;
+    font-size: 0.95rem;
+    color: var(--text-soft);
+  }
+
+  .project-meta p + p { margin-top: 0.7rem; }
+
+  .hero-image {
+    position: relative;
+    margin-bottom: 3rem;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    overflow: visible;
+    min-height: 28rem;
+  }
+
+  .hero-image::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(7, 15, 30, 0.08) 0%, rgba(7, 15, 30, 0.22) 36%, rgba(7, 15, 30, 0.72) 100%),
+      linear-gradient(120deg, rgba(11, 18, 32, 0.36) 0%, transparent 42%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-image img,
+  .gallery-item img {
+    width: 100%;
+    display: block;
+  }
+
+  .hero-image img {
+    height: 28rem;
+    object-fit: cover;
+    object-position: center center;
+    transform: scale(1.01);
+    background: #151212;
+  }
+
+  .hero-caption {
+    position: absolute;
+    left: 2rem;
+    right: 2rem;
+    bottom: 1.8rem;
+    z-index: 2;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    padding: 1.1rem 1.2rem;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08)),
+      linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04));
+    border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 1.1rem;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      0 10px 28px rgba(8, 14, 28, 0.18);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+  }
+
+  .hero-caption .label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.84;
+    margin-bottom: 0.45rem;
+  }
+
+  .hero-caption .title {
+    font-size: clamp(1.8rem, 4vw, 3.2rem);
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+    font-weight: 800;
+    max-width: 10ch;
+  }
+
+  .hero-caption .meta {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.78;
+    white-space: nowrap;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.8rem;
+    align-items: start;
+    padding-bottom: 2rem;
+  }
+
+  .gallery-item,
+  .text-card {
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.68);
+    border-radius: 1.9rem;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.74)),
+      linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.04));
+    padding: 1rem;
+    justify-self: center;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(18px) saturate(135%);
+    -webkit-backdrop-filter: blur(18px) saturate(135%);
+    isolation: isolate;
+    transition:
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.45s ease,
+      border-color 0.35s ease;
+  }
+
+  .gallery-item::before,
+  .gallery-item::after,
+  .text-card::before,
+  .text-card::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .gallery-item::before,
+  .text-card::before {
+    inset: 0;
+    background:
+      radial-gradient(circle at top left, rgba(255,255,255,0.72), transparent 32%),
+      linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02) 46%, rgba(255,255,255,0.08));
+    z-index: 0;
+  }
+
+  .gallery-item::after,
+  .text-card::after {
+    top: 0.72rem;
+    left: 0.72rem;
+    right: 0.72rem;
+    bottom: 0.72rem;
+    border: 1px solid rgba(255,255,255,0.52);
+    border-radius: 1.32rem;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.82),
+      inset 0 -1px 0 rgba(255,255,255,0.08);
+    z-index: 1;
+  }
+
+  .gallery-item:hover,
+  .text-card:hover {
+    transform: translateY(-0.4rem) scale(1.012);
+    border-color: rgba(255,255,255,0.88);
+    box-shadow: var(--shadow-deep);
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    background: rgba(255,255,255,0.96);
+    border-radius: 1.22rem;
+    position: relative;
+    z-index: 2;
+    box-shadow:
+      0 12px 30px rgba(36, 28, 20, 0.08),
+      inset 0 1px 0 rgba(255,255,255,0.7);
+    transition:
+      transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.45s ease,
+      filter 0.45s ease;
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.028);
+    box-shadow:
+      0 20px 38px rgba(36, 28, 20, 0.12),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+    filter: saturate(1.03) contrast(1.02);
+  }
+
+  .gallery-item figcaption {
+    position: relative;
+    z-index: 2;
+    margin-top: 0.9rem;
+    padding-left: 0.15rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(23, 23, 23, 0.52);
+  }
+
+  .text-card {
+    z-index: 2;
+    padding: 1.5rem 1.55rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .text-card .card-label,
+  .text-card h3,
+  .text-card p {
+    position: relative;
+    z-index: 2;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  .text-card .card-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(23, 23, 23, 0.46);
+  }
+
+  .text-card h3 {
+    font-size: clamp(1.7rem, 2.8vw, 2.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    max-width: 10ch;
+  }
+
+  .text-card p {
+    font-size: 0.95rem;
+    line-height: 1.85;
+    color: rgba(23, 23, 23, 0.72);
+  }
+
+  .pair-card {
+    grid-column: 1 / span 8;
+    padding: 1.1rem;
+    min-height: 29.25rem;
+  }
+
+  .pair-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .pair-grid figure {
+    min-width: 0;
+  }
+
+  .pair-grid img {
+    max-height: 28rem;
+  }
+
+  .motion-panel {
+    grid-column: 1 / span 6;
+    justify-self: stretch;
+    align-self: start;
+    position: relative;
+    z-index: 2;
+    margin: -0.6rem 0 0;
+    height: 10.2rem;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .motion-track,
+  .motion-ball,
+  .motion-label {
+    position: absolute;
+  }
+
+  .motion-track {
+    left: 1rem;
+    right: 0.4rem;
+    top: 0;
+    bottom: 0;
+  }
+
+  .motion-step {
+    position: absolute;
+    width: 6.6rem;
+    height: 0.92rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(232,226,216,0.98));
+    box-shadow:
+      0 14px 26px rgba(36, 28, 20, 0.16),
+      0 3px 8px rgba(36, 28, 20, 0.1),
+      inset 0 1px 0 rgba(255,255,255,0.86);
+  }
+
+  .motion-step-a { left: 0.3rem; top: 0.9rem; }
+  .motion-step-b { left: 7.55rem; top: 3.55rem; }
+  .motion-step-c { left: 14.95rem; top: 6.7rem; }
+
+  .motion-ball {
+    top: 0.2rem;
+    left: 1.2rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 30% 28%, rgba(255,255,255,0.98), rgba(255,255,255,0.22) 34%, rgba(88,145,255,0.72) 56%, rgba(33,54,112,0.98) 100%),
+      radial-gradient(circle at 64% 68%, rgba(255,255,255,0.14), transparent 58%),
+      radial-gradient(circle at 55% 40%, rgba(89, 221, 184, 0.28), transparent 42%);
+    box-shadow:
+      0 16px 32px rgba(48, 66, 120, 0.32),
+      inset -0.24rem -0.38rem 0.74rem rgba(18, 28, 58, 0.34);
+    z-index: 3;
+    animation: globeRoll 7.4s cubic-bezier(0.48, 0, 0.22, 1) infinite;
+  }
+
+  .motion-ball::before,
+  .motion-ball::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+  }
+
+  .motion-ball::before {
+    inset: 0.26rem;
+    border: 1px solid rgba(255,255,255,0.34);
+    opacity: 0.72;
+  }
+
+  .motion-ball::after {
+    inset: 0.62rem 0.38rem 0.4rem 0.68rem;
+    background: radial-gradient(circle at 45% 45%, rgba(255,255,255,0.72), rgba(255,255,255,0) 68%);
+    mix-blend-mode: screen;
+  }
+
+  .motion-label {
+    left: 1rem;
+    bottom: 0.1rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(23,23,23,0.45);
+  }
+
+  @keyframes globeRoll {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    22% { transform: translate3d(10.2rem, 2.2rem, 0) scale(0.98); }
+    44% { transform: translate3d(20.55rem, 4.45rem, 0) scale(0.96); }
+    58% { transform: translate3d(20.55rem, 4.45rem, 0) scale(0.96); }
+    72% { transform: translate3d(10.2rem, 2.2rem, 0) scale(1.01); }
+    88% { transform: translate3d(0, 0, 0) scale(1.03); }
+    100% { transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  .concept-card {
+    grid-column: 9 / span 4;
+    min-height: 29.25rem;
+    align-self: start;
+    margin-top: 0;
+  }
+
+  .triptych-card,
+  .detail-card-left,
+  .detail-card-right {
+    width: 100%;
+    max-width: none;
+    position: relative;
+    align-self: start;
+    padding-bottom: 2.4rem;
+  }
+
+  .triptych-card {
+    grid-column: 1 / span 2;
+    justify-self: stretch;
+    margin-top: 0;
+    padding: 0.56rem 0.56rem 2.4rem;
+    box-shadow:
+      0 14px 24px rgba(36, 28, 20, 0.12),
+      0 28px 48px rgba(36, 28, 20, 0.18);
+  }
+
+  .detail-card-left {
+    grid-column: 3 / span 2;
+    justify-self: stretch;
+    margin-top: 6.7rem;
+    padding: 0.56rem 0.56rem 2.4rem;
+    box-shadow:
+      0 16px 28px rgba(36, 28, 20, 0.13),
+      0 30px 52px rgba(36, 28, 20, 0.2);
+  }
+
+  .detail-card-right {
+    grid-column: 5 / span 2;
+    justify-self: stretch;
+    margin-top: 13.4rem;
+    padding: 0.56rem 0.56rem 2.4rem;
+    box-shadow:
+      0 18px 30px rgba(36, 28, 20, 0.14),
+      0 34px 58px rgba(36, 28, 20, 0.22);
+  }
+
+  .triptych-card img,
+  .detail-card-left img,
+  .detail-card-right img {
+    width: 100%;
+    max-height: 8rem;
+    object-fit: cover;
+  }
+
+  .motion-panel {
+    position: absolute;
+    left: 0.7rem;
+    right: 0.7rem;
+    bottom: 0.55rem;
+    height: 0.95rem;
+    z-index: 4;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .motion-track {
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 100%;
+  }
+
+  .motion-step {
+    position: absolute;
+    width: calc(100% - 0.4rem);
+    height: 0.92rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(232,226,216,0.98));
+    box-shadow:
+      0 14px 26px rgba(36, 28, 20, 0.16),
+      0 3px 8px rgba(36, 28, 20, 0.1),
+      inset 0 1px 0 rgba(255,255,255,0.86);
+  }
+
+  .motion-step-a { left: 0.2rem; top: 0; }
+
+  .motion-ball,
+  .motion-label {
+    display: none;
+  }
+
+  .effect-card {
+    grid-column: 7 / span 6;
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
+    margin-top: 0;
+    align-self: start;
+    padding: 0.15rem;
+    background: rgba(255,255,255,0.18);
+  }
+
+  .effect-card::before {
+    display: none;
+  }
+
+  .effect-card img {
+    width: 100%;
+    max-height: 28rem;
+    min-height: 24.5rem;
+    object-fit: contain;
+    object-position: center center;
+    background: transparent;
+    border-radius: 0.9rem;
+    box-shadow: 0 18px 40px rgba(36, 28, 20, 0.12);
+  }
+
+  .board-card {
+    grid-column: 1 / span 7;
+    max-width: 100%;
+    justify-self: stretch;
+    margin-top: 0.2rem;
+    margin-bottom: 0;
+    align-self: start;
+  }
+
+  .board-card::after {
+    content: "";
+    position: absolute;
+    left: 1.2rem;
+    right: -2.8rem;
+    bottom: 3.2rem;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(23,23,23,0.26), rgba(23,23,23,0.08));
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .board-card img {
+    max-height: 32rem;
+  }
+
+  .project-note {
+    grid-column: 8 / span 5;
+    min-height: auto;
+    align-self: start;
+    margin-top: 2.4rem;
+    margin-left: -0.6rem;
+    padding-top: 2rem;
+    background: rgba(248, 244, 237, 0.92);
+    border-top-left-radius: 4.4rem;
+    contain: layout paint;
+    -webkit-font-smoothing: antialiased;
+    z-index: 3;
+  }
+
+  @media (max-width: 860px) {
+    .page { padding: 1rem; }
+    .project-header h1,
+    .project-meta { grid-column: span 12; }
+    .hero-image {
+      min-height: 20rem;
+    }
+    .hero-image img {
+      height: 20rem;
+    }
+    .hero-caption {
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .hero-caption .meta {
+      white-space: normal;
+    }
+    .gallery {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    .gallery-item,
+    .gallery-item.feature-wide,
+    .gallery-item.triptych,
+    .gallery-item.tall,
+    .gallery-item.medium-wide,
+    .gallery-item.flat-wide,
+    .gallery-item.board,
+    .text-card {
+      grid-column: auto;
+      max-width: 100%;
+      width: 100%;
+      margin-top: 0;
+      margin-left: 0;
+      justify-self: stretch;
+    }
+    .motion-panel {
+      display: none;
+    }
+    .gallery-item.flat-wide img,
+    .gallery-item.board img {
+      max-height: none;
+    }
+    .grid-overlay::before {
+      background-size: calc((100vw - 2rem) / 6) 100%, 100% 12.5vh;
+      background-position: 1rem 0, 0 0;
+    }
+  }
+  @media (max-width: 520px) {
+    .page { padding: 0.75rem; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+    .back-link, .home-link { font-size: 0.72rem; }
+    .project-header h1 { font-size: 2rem; }
+    .project-meta { font-size: 0.88rem; }
+    .hero-image { min-height: 16rem; }
+    .hero-image img { height: 16rem; }
+    .hero-caption { left: 0.7rem; right: 0.7rem; bottom: 0.7rem; padding: 0.8rem 1rem; }
+    .hero-caption .title { font-size: 1.5rem; }
+    .gallery-item { padding: 0.7rem; }
+    .gallery-item figcaption { font-size: 0.72rem; }
+    .text-card { padding: 1rem; }
+    .text-card h3 { font-size: 1.1rem; }
+    .text-card p { font-size: 0.88rem; }
+    .pair-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+<div class="page">
+  <div class="topbar">
+    <a class="back-link" href="./index.html#works">Back to Works</a>
+    <a class="home-link" href="./index.html">杨昀桦 / YyUHua</a>
+  </div>
+
+  <section class="project-header">
+    <h1>第81届<br>世界科幻大会</h1>
+    <div class="project-meta">
+      <p>2023 · Key Visual / Event Identity / Spatial Extension</p>
+      <p>围绕第81届世界科幻大会展开主视觉与活动传播表达，延展出更具未来感与识别度的大会形象系统。</p>
+    </div>
+  </section>
+
+  <figure class="hero-image">
+    <img src="./assets/4541ce77e4247c30d6e7fc7a9ef8af4c-1.jpg" alt="第81届世界科幻大会封面图">
+    <div class="hero-caption">
+      <div>
+        <div class="label">Featured Project</div>
+        <div class="title">第81届世界科幻大会</div>
+      </div>
+      <div class="meta">World Science Fiction Convention</div>
+    </div>
+  </figure>
+
+  <section class="gallery">
+    <div class="gallery-item pair-card">
+      <div class="pair-grid">
+        <figure>
+          <img src="./assets/素材2.jpg" alt="世界科幻大会黑白主视觉方案">
+          <figcaption>Monochrome Key Visual</figcaption>
+        </figure>
+        <figure>
+          <img src="./assets/素材3.jpg" alt="世界科幻大会彩色主视觉方案">
+          <figcaption>Color Exploration</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <article class="text-card concept-card">
+      <div class="card-label">Creative Direction</div>
+      <h3>从宇宙想象到城市现场的双轨视觉表达</h3>
+      <p>这一组主视觉从两条路径同步推进：黑白方案先建立科幻叙事的秩序感与未来张力，用更克制的版式和明暗关系拉出大会的精神骨架；彩色方案再把成都在地气质与世界科幻大会的公共传播需求叠加进去，让画面在保留想象力的同时，也更适合落到展板、物料与活动现场。</p>
+      <p>我希望它既有科幻文学的距离感，也有大型城市活动需要的清晰识别度，所以最终视觉不是单纯追求“酷”，而是在概念氛围、信息层级和现场适配之间取得平衡。</p>
+    </article>
+
+    <figure class="gallery-item triptych-card">
+      <img src="./assets/素材4.jpg" alt="世界科幻大会竖版展板组合展示">
+      <figcaption>Vertical Display Series</figcaption>
+      <div class="motion-panel" aria-hidden="true">
+        <div class="motion-track">
+          <span class="motion-step motion-step-a"></span>
+        </div>
+      </div>
+    </figure>
+    <figure class="gallery-item detail-card-left">
+      <img src="./assets/素材5.jpg" alt="世界科幻大会版式细节方案一">
+      <figcaption>Typographic Detail 01</figcaption>
+      <div class="motion-panel" aria-hidden="true">
+        <div class="motion-track">
+          <span class="motion-step motion-step-a"></span>
+        </div>
+      </div>
+    </figure>
+    <figure class="gallery-item detail-card-right">
+      <img src="./assets/素材6.jpg" alt="世界科幻大会版式细节方案二">
+      <figcaption>Typographic Detail 02</figcaption>
+      <div class="motion-panel" aria-hidden="true">
+        <div class="motion-track">
+          <span class="motion-step motion-step-a"></span>
+        </div>
+      </div>
+    </figure>
+    <figure class="gallery-item effect-card">
+      <img src="./assets/a229de7f-2fed-40fb-8525-f796968c9dd9.png" alt="世界科幻大会信息展板效果图">
+      <figcaption>Environmental Mockup</figcaption>
+    </figure>
+
+    <figure class="gallery-item board-card">
+      <img src="./assets/素材7.jpg" alt="世界科幻大会信息展板完整设计图">
+      <figcaption>Information Board System</figcaption>
+    </figure>
+
+    <article class="text-card project-note">
+      <div class="card-label">Project Overview</div>
+      <h3>第81届世界科幻大会</h3>
+      <p>第81届世界科幻大会是具有国际影响力的科幻文化盛会，项目需要在大会传播、空间展示与信息导视之间建立统一而鲜明的视觉语言。设计不仅要回应“科幻”这一主题本身，也要让复杂内容在真实场景中被快速理解和记住。</p>
+      <p>因此这套方案以主视觉为起点，继续延展到竖版展板、信息版式和完整展陈界面，让视觉风格、内容组织与现场阅读体验形成同一套系统。</p>
+    </article>
+  </section>
+</div>
+</body>
+</html>

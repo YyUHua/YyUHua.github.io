@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>五行画吉风水画设计 · 杨昀桦</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f6f3ec;
+    --panel: rgba(255, 255, 255, 0.9);
+    --text: #171717;
+    --text-soft: rgba(23, 23, 23, 0.66);
+    --line: rgba(23, 23, 23, 0.1);
+    --grid: rgba(124, 116, 103, 0.18);
+    --accent: #c84c35;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(180deg, #f8f5ef 0%, #f4f0e8 100%);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  .grid-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size:
+      calc((100vw - 4rem) / 12) 100%,
+      100% 11.111vh;
+    background-position: 2rem 0, 0 0;
+    background-repeat: repeat-x, repeat-y;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .back-link,
+  .home-link {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .intro {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    align-items: start;
+  }
+
+  .intro-copy {
+    grid-column: 1 / span 7;
+  }
+
+  .intro-copy h1 {
+    font-size: clamp(3rem, 8vw, 5.8rem);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    margin-bottom: 1.25rem;
+  }
+
+  .eyebrow,
+  .kicker,
+  .shot-label,
+  .note-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow,
+  .shot-label,
+  .note-label { color: var(--accent); }
+
+  .intro-copy p {
+    max-width: 36rem;
+    color: var(--text-soft);
+    font-size: 1rem;
+  }
+
+  .intro-meta {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .meta-card,
+  .note,
+  .shot,
+  .lead-frame {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 1.7rem;
+    box-shadow:
+      0 22px 60px rgba(32, 27, 18, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    isolation: isolate;
+  }
+
+  .meta-card::before,
+  .note::before,
+  .shot::before,
+  .lead-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.12) 42%, rgba(255, 255, 255, 0.18) 100%),
+      radial-gradient(circle at top left, rgba(255, 255, 255, 0.82), transparent 34%);
+  }
+
+  .shot::before {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.12) 44%, rgba(255, 255, 255, 0.14) 100%),
+      linear-gradient(90deg, rgba(210, 194, 166, 0.12), rgba(255, 255, 255, 0) 22%, rgba(210, 194, 166, 0.1) 100%),
+      radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.68), transparent 30%);
+  }
+
+  .meta-card::after,
+  .note::after,
+  .shot::after,
+  .lead-frame::after {
+    content: "";
+    position: absolute;
+    top: 0.7rem;
+    left: 0.7rem;
+    right: 0.7rem;
+    bottom: 0.7rem;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 1.28rem;
+    border: 1px solid rgba(255, 255, 255, 0.52);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.72),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+    opacity: 1;
+  }
+
+  .meta-card > *,
+  .note > *,
+  .shot > *,
+  .lead-frame > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  .meta-card {
+    padding: 1rem 1.1rem;
+  }
+
+  .meta-card p {
+    font-size: 0.92rem;
+    color: var(--text-soft);
+  }
+
+  .meta-card p + p { margin-top: 0.65rem; }
+
+  .hero {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .lead-frame {
+    grid-column: 1 / span 8;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.34);
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    box-shadow:
+      0 28px 72px rgba(32, 27, 18, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.74);
+    backdrop-filter: blur(24px) saturate(165%);
+    -webkit-backdrop-filter: blur(24px) saturate(165%);
+  }
+
+  .lead-frame img,
+  .shot img {
+    width: 100%;
+    display: block;
+  }
+
+  .lead-frame img {
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 1.2rem;
+  }
+
+  .lead-caption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.8rem;
+    align-items: baseline;
+  }
+
+  .lead-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .lead-meta {
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+
+  .notes {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .note {
+    padding: 1rem 1.1rem;
+  }
+
+  .note-label { display: block; margin-bottom: 0.55rem; }
+
+  .note p {
+    font-size: 0.93rem;
+    color: var(--text-soft);
+  }
+
+  .shot-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .shot {
+    padding: 1.5rem 1.25rem 1.6rem;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.9));
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    box-shadow:
+      0 18px 42px rgba(42, 33, 18, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(16px) saturate(128%);
+    -webkit-backdrop-filter: blur(16px) saturate(128%);
+    transform-origin: center center;
+  }
+
+  .shot.large { grid-column: span 6; }
+  .shot.small { grid-column: span 6; }
+
+  .shot:nth-child(1) {
+    --shot-shift: 0.2rem;
+  }
+
+  .shot:nth-child(2) {
+    --shot-shift: -0.08rem;
+  }
+
+  .shot:nth-child(3) {
+    --shot-shift: 0.32rem;
+  }
+
+  .shot:nth-child(4) {
+    --shot-shift: -0.12rem;
+  }
+
+  .shot:nth-child(5) {
+    --shot-shift: 0.12rem;
+  }
+
+  .shot:nth-child(6) {
+    --shot-shift: -0.2rem;
+  }
+
+  .shot:nth-child(2n) {
+    animation-duration: 9.6s;
+    animation-delay: -1.2s;
+  }
+
+  .shot:nth-child(3n) {
+    animation-duration: 10.8s;
+    animation-delay: -2.4s;
+  }
+
+  .shot::after {
+    top: 0.7rem;
+    left: 0.7rem;
+    right: 0.7rem;
+    bottom: 0.7rem;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 1.28rem;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.58),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    opacity: 1;
+  }
+
+  .shot::before,
+  .shot figcaption::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .shot::before {
+    display: none;
+  }
+
+  .shot img {
+    width: 100%;
+    max-width: 58%;
+    margin: 0 auto;
+    aspect-ratio: 16 / 10;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(133, 119, 94, 0.1);
+    border-radius: 0.18rem;
+    padding: 0.8rem;
+    box-shadow:
+      0 12px 22px rgba(61, 50, 30, 0.06),
+      0 2px 6px rgba(61, 50, 30, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.86);
+    animation: artworkFloat 8.4s ease-in-out infinite;
+    transform-origin: center center;
+    position: relative;
+    z-index: 2;
+    transition:
+      transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .shot:hover img {
+    transform: scale(1.04);
+    box-shadow:
+      0 18px 30px rgba(61, 50, 30, 0.1),
+      0 4px 10px rgba(61, 50, 30, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .shot:nth-child(1) img {
+    max-width: 55%;
+    animation-delay: -0.8s;
+  }
+
+  .shot:nth-child(2) img {
+    max-width: 59%;
+    animation-delay: -2.1s;
+  }
+
+  .shot:nth-child(3) img {
+    max-width: 53%;
+    animation-delay: -1.4s;
+  }
+
+  .shot:nth-child(4) img {
+    max-width: 58%;
+    animation-delay: -3s;
+  }
+
+  .shot:nth-child(5) img {
+    max-width: 54%;
+    animation-delay: -1.8s;
+  }
+
+  .shot:nth-child(6) img {
+    max-width: 60%;
+    animation-delay: -2.6s;
+  }
+
+  .shot figcaption {
+    position: relative;
+    padding-top: 1rem;
+    max-width: 58%;
+    margin: 0 auto;
+    text-align: left;
+    z-index: 2;
+    transform: translateY(var(--shot-shift, 0));
+  }
+
+  .shot figcaption::before {
+    inset: -0.28rem -0.35rem -0.3rem;
+    border-radius: 0.28rem;
+    background: rgba(255, 255, 255, 0.36);
+    opacity: 0.62;
+    z-index: -1;
+  }
+
+  .shot:nth-child(1) figcaption { max-width: 55%; }
+  .shot:nth-child(2) figcaption { max-width: 59%; }
+  .shot:nth-child(3) figcaption { max-width: 53%; }
+  .shot:nth-child(4) figcaption { max-width: 58%; }
+  .shot:nth-child(5) figcaption { max-width: 54%; }
+  .shot:nth-child(6) figcaption { max-width: 60%; }
+
+  .shot-title {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 0.2rem;
+  }
+
+  .shot-copy {
+    display: block;
+    margin-top: 0.45rem;
+    font-size: 0.92rem;
+    color: var(--text-soft);
+  }
+
+  @media (max-width: 520px) {
+    .page { padding: 0.75rem; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+    .back-link, .home-link { font-size: 0.72rem; }
+
+    .intro-copy,
+    .intro-meta,
+    .lead-frame,
+    .notes { grid-column: span 12; }
+
+    .intro-copy h1 { font-size: 2.2rem; }
+    .intro-copy p { font-size: 0.92rem; }
+
+    .lead-frame { padding: 0.8rem; }
+    .lead-caption { flex-direction: column; gap: 0.3rem; }
+    .lead-meta { white-space: normal; font-size: 0.76rem; }
+    .lead-title { font-size: 1rem; }
+
+    .shot { padding: 1rem 0.8rem 1.1rem; }
+    .shot img { max-width: 88%; padding: 0.5rem; }
+    .shot figcaption { max-width: 88%; }
+    .shot-title { font-size: 0.92rem; }
+    .shot-copy { font-size: 0.84rem; }
+    .meta-card p { font-size: 0.86rem; }
+    .note p { font-size: 0.86rem; }
+  }
+
+  @keyframes galleryFloat {
+    0%, 100% {
+      transform: translate3d(0, calc(var(--shot-shift, 0) + 0.08rem), 0);
+    }
+    50% {
+      transform: translate3d(0, calc(var(--shot-shift, 0) - 0.12rem), 0);
+    }
+  }
+
+  @keyframes artworkFloat {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(0, -0.12rem, 0) scale(1.006);
+    }
+  }
+
+  @media (max-width: 920px) {
+    .page { padding: 1rem; }
+
+    .shot.large,
+    .shot.small {
+      grid-column: span 12;
+    }
+
+    .shot {
+      --shot-shift: 0rem;
+    }
+
+    .shot::before {
+      width: calc(100% - 3.9rem);
+      height: calc(100% - 6.5rem);
+      transform: translateX(-50%) translateY(0.32rem);
+    }
+
+    .shot img,
+    .shot figcaption {
+      max-width: 100%;
+    }
+
+    .grid-overlay::before {
+      background-size: calc((100vw - 2rem) / 6) 100%, 100% 12.5vh;
+      background-position: 1rem 0, 0 0;
+    }
+
+    .lead-caption {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .lead-meta {
+      white-space: normal;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+<div class="page">
+  <div class="topbar">
+    <a class="back-link" href="./index.html#works">Back to Works</a>
+    <a class="home-link" href="./index.html">杨昀桦 / YyUHua</a>
+  </div>
+
+  <section class="intro">
+    <div class="intro-copy">
+      <div class="eyebrow">Product Visual · 2026</div>
+      <h1>五行画吉风水画设计</h1>
+      <p>围绕五行画吉系列，分别展开水、土、火、金、木与五行和合六张作品。重点呈现画面氛围、五行属性与对应寓意，以及它们作为产品视觉时的整体表达。</p>
+    </div>
+    <div class="intro-meta">
+      <div class="meta-card">
+        <p>项目：图阿凸 / 五行画吉</p>
+        <p>类型：产品视觉 / 风水画系列</p>
+        <p>内容：系列封面 / 单品展示 / 五行寓意</p>
+      </div>
+      <div class="meta-card">
+        <p>系列以山水、林木、祥云、金色山脉等视觉元素建立不同五行气质，让单张作品与整体产品表达同时成立。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero">
+    <figure class="lead-frame">
+      <img src="./assets/d14a417be86a28c9d8d8e9d80e7d6d33.jpg" alt="五行画吉风水画设计封面图">
+      <figcaption class="lead-caption">
+        <div>
+          <div class="kicker">Collection Cover</div>
+          <div class="lead-title">系列封面与家居场景展示</div>
+        </div>
+        <div class="lead-meta">Tuartoo Collection</div>
+      </figcaption>
+    </figure>
+
+    <div class="notes">
+      <div class="note">
+        <span class="note-label">Series View</span>
+        <p>以完整挂画场景作为封面入口，先建立系列气质，再进入单张作品的五行表达。</p>
+      </div>
+      <div class="note">
+        <span class="note-label">Meaning Match</span>
+        <p>每张作品都对应独立五行属性与象义解析，名称、画面与寓意一一对应。</p>
+      </div>
+      <div class="note">
+        <span class="note-label">Product Expression</span>
+        <p>从系列封面到单品展示，整体强调可感知、可理解、可销售的产品视觉表达。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="shot-grid">
+    <figure class="shot large">
+      <img src="./assets/水.jpeg" alt="水 · 五行画吉风水画">
+      <figcaption>
+        <span class="shot-label">Water</span>
+        <span class="shot-title">水</span>
+        <span class="shot-copy">核心主五行为水。蓝海海浪直接契合坎卦水性，主财运、智慧、事业流动性与贵人运。</span>
+      </figcaption>
+    </figure>
+
+    <figure class="shot small">
+      <img src="./assets/土.jpeg" alt="土 · 五行画吉风水画">
+      <figcaption>
+        <span class="shot-label">Earth</span>
+        <span class="shot-title">土</span>
+        <span class="shot-copy">厚重山脉与峡谷肌理强调家庭根基、镇宅守运、福报积累与靠山运势。</span>
+      </figcaption>
+    </figure>
+
+    <figure class="shot small">
+      <img src="./assets/火.jpeg" alt="火 · 五行画吉风水画">
+      <figcaption>
+        <span class="shot-label">Fire</span>
+        <span class="shot-title">火</span>
+        <span class="shot-copy">红色基底、祥云与仙鹤共同建立事业、名望、贵人与上升势能。</span>
+      </figcaption>
+    </figure>
+
+    <figure class="shot large">
+      <img src="./assets/金.jpeg" alt="金 · 五行画吉风水画">
+      <figcaption>
+        <span class="shot-label">Metal</span>
+        <span class="shot-title">金</span>
+        <span class="shot-copy">金色山脉作为能量核心，带出财富积累、决断力、贵气与事业格局。</span>
+      </figcaption>
+    </figure>
+
+    <figure class="shot small">
+      <img src="./assets/木.jpeg" alt="木 · 五行画吉风水画">
+      <figcaption>
+        <span class="shot-label">Wood</span>
+        <span class="shot-title">木</span>
+        <span class="shot-copy">林木与草地强调生发向上、机遇成长与仁爱通达，让画面更有生命力。</span>
+      </figcaption>
+    </figure>
+
+    <figure class="shot large">
+      <img src="./assets/五行和合.jpeg" alt="五行和合 · 五行画吉风水画">
+      <figcaption>
+        <span class="shot-label">Harmony</span>
+        <span class="shot-title">五行和合</span>
+        <span class="shot-copy">五行共生、和合为贵。整体强调家宅安稳、镇宅旺运与能量平衡。</span>
+      </figcaption>
+    </figure>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>杨昀桦 · YyUHua</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:#07070d;
+  color:#e8e8ed;
+  font-family:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  overflow-x:hidden
+}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:4px}
+
+canvas#bg{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none}
+
+/* ---- Orbs ---- */
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;mix-blend-mode:screen}
+.orb-1{width:600px;height:600px;background:radial-gradient(circle,rgba(99,102,241,0.12),transparent);top:-20%;right:-10%;animation:o1 25s ease-in-out infinite}
+.orb-2{width:700px;height:700px;background:radial-gradient(circle,rgba(168,85,247,0.08),transparent);bottom:-30%;left:-20%;animation:o2 30s ease-in-out infinite}
+.orb-3{width:400px;height:400px;background:radial-gradient(circle,rgba(59,130,246,0.06),transparent);top:50%;left:50%;animation:o3 20s ease-in-out infinite}
+@keyframes o1{0%,100%{transform:translate(0,0)scale(1)}33%{transform:translate(-80px,50px)scale(1.1)}66%{transform:translate(50px,-70px)scale(.9)}}
+@keyframes o2{0%,100%{transform:translate(0,0)scale(1)}33%{transform:translate(60px,-40px)scale(1.15)}66%{transform:translate(-50px,60px)scale(.85)}}
+@keyframes o3{0%,100%{transform:translate(0,0)scale(1)}50%{transform:translate(40px,50px)scale(1.1)}}
+
+/* ---- Cursor ---- */
+#glow{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.04)0%,transparent 60%);pointer-events:none;z-index:1;transform:translate(-50%,-50%);mix-blend-mode:screen}
+
+/* ---- Section ---- */
+.section{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 24px}
+.section-inner{max-width:1000px;width:100%}
+
+/* ---- HERO ---- */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.hero-burst{
+  position:absolute;
+  top:50%;left:50%;
+  width:800px;height:800px;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(99,102,241,0.06)0%,rgba(168,85,247,0.03)30%,transparent 60%);
+  pointer-events:none;
+  animation:burstPulse 4s ease-in-out infinite;
+}
+@keyframes burstPulse{
+  0%,100%{transform:translate(-50%,-50%)scale(1);opacity:.6}
+  50%{transform:translate(-50%,-50%)scale(1.15);opacity:1}
+}
+.hero-glass{
+  position:absolute;
+  inset:auto 10%;top:50%;transform:translateY(-50%);
+  padding:60px 80px;
+  background:rgba(255,255,255,0.015);
+  backdrop-filter:blur(40px);
+  -webkit-backdrop-filter:blur(40px);
+  border:1px solid rgba(255,255,255,0.04);
+  border-radius:32px;
+  pointer-events:none;
+}
+.hero-glass::before{
+  content:'';position:absolute;inset:-1px;
+  border-radius:33px;
+  background:linear-gradient(135deg,rgba(99,102,241,0.1),transparent 40%,transparent 60%,rgba(168,85,247,0.1));
+  z-index:-1;mask:linear-gradient(#000,#000)content-box,linear-gradient(#000,#000);
+  -webkit-mask:linear-gradient(#000,#000)content-box,linear-gradient(#000,#000);
+  mask-composite:exclude;
+  -webkit-mask-composite:exclude;
+  padding:1px;
+}
+.hero-greet{
+  font-size:.75rem;letter-spacing:6px;text-transform:uppercase;
+  color:rgba(255,255,255,0.12);margin-bottom:24px;font-weight:300;
+  opacity:0;animation:hf 1s .3s forwards;position:relative;z-index:3;
+}
+.hero-name{
+  font-size:clamp(4rem,13vw,8.5rem);font-weight:700;
+  letter-spacing:-.04em;line-height:1;margin-bottom:2px;
+  opacity:0;animation:hf 1s .5s forwards;position:relative;z-index:3;
+}
+.hero-name .accent{
+  background:linear-gradient(135deg,#818cf8 0%,#a855f7 40%,#d946ef 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 40px rgba(99,102,241,.3));
+  animation:glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse{
+  0%,100%{filter:drop-shadow(0 0 30px rgba(99,102,241,.2))}
+  50%{filter:drop-shadow(0 0 60px rgba(99,102,241,.4))}
+}
+.hero-name .cn{
+  font-weight:200;
+  background:linear-gradient(135deg,#e8e8ed,#8888a0);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-size:.35em;display:block;margin-top:-6px;letter-spacing:10px;
+}
+.hero-tagline{
+  font-size:clamp(.95rem,1.8vw,1.3rem);
+  color:rgba(255,255,255,.18);font-weight:200;letter-spacing:14px;
+  margin:14px 0 10px;
+  opacity:0;animation:hf 1s .7s forwards;position:relative;z-index:3;
+  min-height:1.4em;
+}
+#tw::after{content:'|';animation:blink 1s step-end infinite;color:rgba(255,255,255,.15)}
+@keyframes blink{50%{opacity:0}}
+.hero-sub{
+  font-size:clamp(.75rem,1.1vw,.85rem);color:rgba(255,255,255,.08);
+  font-weight:200;letter-spacing:6px;
+  opacity:0;animation:hf 1s .9s forwards;position:relative;z-index:3;
+}
+.hero-line{
+  width:28px;height:1px;background:rgba(255,255,255,.06);margin:32px auto;
+  opacity:0;animation:hf 1s 1.1s forwards;
+}
+.hero-btns{
+  display:flex;gap:12px;
+  opacity:0;animation:hf 1s 1.3s forwards;position:relative;z-index:3;
+}
+.btn-glass{
+  padding:10px 28px;border-radius:24px;
+  background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);
+  color:rgba(255,255,255,.3);font-size:.75rem;letter-spacing:2px;
+  cursor:pointer;transition:all .3s;text-decoration:none;font-family:inherit;
+}
+.btn-glass:hover{
+  background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.15);
+  color:rgba(255,255,255,.6);transform:translateY(-2px);
+  box-shadow:0 4px 20px rgba(99,102,241,.1);
+}
+.btn-primary{
+  background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(168,85,247,.15));
+  border-color:rgba(99,102,241,.2);color:rgba(255,255,255,.5);
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(168,85,247,.25));
+  border-color:rgba(99,102,241,.3);color:rgba(255,255,255,.8);
+}
+.hero-scroll{
+  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  opacity:0;animation:hf 1s 1.5s forwards;
+  color:rgba(255,255,255,.08);font-size:.55rem;letter-spacing:2px;
+}
+.scroll-bar{width:1px;height:30px;background:linear-gradient(to bottom,rgba(255,255,255,.1),transparent);animation:sp 2.5s ease-in-out infinite}
+@keyframes sp{0%,100%{opacity:.2}50%{opacity:.8}}
+@keyframes hf{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---- Glass Card ---- */
+.glass-card{
+  background:rgba(255,255,255,.015);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.04);
+  border-radius:24px;padding:44px;
+  position:relative;overflow:hidden;
+  transition:all .5s cubic-bezier(.23,1,.32,1);
+}
+.glass-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(99,102,241,.05)0%,transparent 60%);
+  pointer-events:none;opacity:0;transition:opacity .5s;
+}
+.glass-card:hover::before{opacity:1}
+.glass-card:hover{
+  border-color:rgba(255,255,255,.07);
+  transform:translateY(-3px);
+  box-shadow:0 24px 80px rgba(0,0,0,.4);
+}
+
+/* ---- Labels ---- */
+.sl{font-size:.65rem;letter-spacing:5px;text-transform:uppercase;color:rgba(255,255,255,.1);margin-bottom:8px;font-weight:400}
+.st{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;letter-spacing:-.02em;margin-bottom:36px;line-height:1.25}
+.st .g{background:linear-gradient(135deg,#818cf8,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ---- About ---- */
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.ai{padding:18px 22px;background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.02);border-radius:14px;transition:all .3s}
+.ai:hover{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.04)}
+.ai .lb{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.12);margin-bottom:3px}
+.ai .vl{font-size:.9rem;color:rgba(255,255,255,.5);font-weight:300}
+.int{padding:14px 22px;background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.02);border-radius:14px}
+.int .lb{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.12);margin-bottom:6px}
+.tg{display:inline-block;padding:2px 10px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.08);border-radius:16px;font-size:.75rem;margin:2px 2px;color:rgba(255,255,255,.4);transition:all .3s;cursor:default}
+.tg:hover{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.12);color:rgba(255,255,255,.55);transform:translateY(-1px)}
+
+/* ---- Stats ---- */
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sc{padding:26px 14px 22px;text-align:center;background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.02);border-radius:14px;transition:all .4s;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(99,102,241,.15),transparent);opacity:0;transition:opacity .4s}
+.sc:hover::after{opacity:1}
+.sc:hover{background:rgba(255,255,255,.02);border-color:rgba(99,102,241,.06);transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.sn{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,#818cf8,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:4px}
+.sn .pl{font-size:.6em;-webkit-text-fill-color:rgba(168,85,247,.4)}
+.slb{font-size:.6rem;color:rgba(255,255,255,.15);letter-spacing:2px;text-transform:uppercase}
+
+/* ---- Exp ---- */
+.el{display:flex;flex-direction:column;gap:8px}
+.ei{display:flex;align-items:center;gap:12px;padding:16px 20px;background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.02);border-radius:12px;transition:all .3s}
+.ei:hover{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.04);transform:translateX(4px)}
+.ec{width:34px;height:34px;border-radius:8px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem}
+.et{font-size:.82rem;color:rgba(255,255,255,.4);font-weight:300;line-height:1.5}
+.et strong{color:rgba(255,255,255,.7);font-weight:500}
+
+/* ---- Proj ---- */
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc{padding:26px;background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.02);border-radius:14px;transition:all .4s;position:relative;overflow:hidden}
+.pc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(99,102,241,.15),transparent);transform:scaleX(0);transition:transform .5s}
+.pc:hover::before{transform:scaleX(1)}
+.pc:hover{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.04);transform:translateY(-5px);box-shadow:0 15px 50px rgba(0,0,0,.3)}
+.pi{font-size:1.4rem;margin-bottom:10px}
+.pn{font-size:.95rem;font-weight:500;margin-bottom:4px;color:rgba(255,255,255,.7)}
+.pd{font-size:.75rem;color:rgba(255,255,255,.3);line-height:1.6;font-weight:300}
+
+/* ---- Skills ---- */
+.skg{margin-bottom:20px}
+.skg:last-child{margin-bottom:0}
+.skl{font-size:.65rem;letter-spacing:3px;color:rgba(255,255,255,.12);margin-bottom:8px;font-weight:400}
+.stg{display:flex;flex-wrap:wrap;gap:6px}
+.st{font-size:.75rem;color:rgba(255,255,255,.3);transition:all .3s;font-weight:300;cursor:default}
+.st:hover{color:rgba(255,255,255,.6);transform:translateY(-2px)}
+
+/* ---- Footer ---- */
+.footer{text-align:center;padding:50px 24px 30px;position:relative;z-index:2}
+.fl{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);margin-bottom:16px}
+.ft{font-size:.7rem;color:rgba(255,255,255,.08);font-weight:200;letter-spacing:4px}
+
+/* ---- Reveal ---- */
+.rv{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.23,1,.32,1),transform .8s cubic-bezier(.23,1,.32,1)}
+.rv.vis{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+@media(max-width:768px){
+  .ag{grid-template-columns:1fr}.pg{grid-template-columns:1fr}.sr{grid-template-columns:repeat(2,1fr)}
+  .glass-card{padding:26px}.hero-glass{inset:auto 5%;padding:40px 30px}
+  .hero-name{font-size:clamp(2.5rem,15vw,4rem)}
+}
+@media(max-width:480px){
+  .section{padding:60px 16px}.hero-btns{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div id="glow"></div>
+
+<!-- HERO -->
+<section class="section hero">
+  <div class="hero-burst"></div>
+  <div class="hero-glass"></div>
+  <p class="hero-greet">✦ 你好 · 世界</p>
+  <h1 class="hero-name">
+    <span class="accent">YyUHua</span>
+    <span class="cn">杨昀桦</span>
+  </h1>
+  <p class="hero-tagline"><span id="tw"></span></p>
+  <p class="hero-sub">DESIGNER · ENGINEER · DREAMER</p>
+  <div class="hero-line"></div>
+  <div class="hero-btns">
+    <button class="btn-glass btn-primary" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">✦ 进入宇宙</button>
+    <a class="btn-glass" href="mailto:18349862535@163.com">✉ 联系我</a>
+  </div>
+  <div class="hero-scroll"><span>SCROLL</span><div class="scroll-bar"></div></div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="section-inner">
+    <div class="rv"><p class="sl">/ 关于我</p><h2 class="st">从视觉到代码，<br><span class="g">在感性与理性之间</span></h2></div>
+    <div class="glass-card rv">
+      <div class="ag">
+        <div class="ai"><div class="lb">年龄</div><div class="vl">25 岁</div></div>
+        <div class="ai"><div class="lb">人格</div><div class="vl">INFP · 双鱼座</div></div>
+        <div class="ai"><div class="lb">学历</div><div class="vl">四川大学 硕士（在读）</div></div>
+        <div class="ai"><div class="lb">所在地</div><div class="vl">四川 · 成都</div></div>
+      </div>
+      <div class="int">
+        <div class="lb">兴趣</div>
+        <span class="tg">☕ 咖啡</span><span class="tg">✏ 设计</span><span class="tg">📖 文学创作</span><span class="tg">🎵 陈奕迅</span><span class="tg">📚 陀思妥耶夫斯基</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="rv"><p class="sl">/ 数字</p></div>
+    <div class="sr">
+      <div class="sc rv d1"><div class="sn"><span data-n="100">0</span><span class="pl">+</span></div><div class="slb">品牌营销案例</div></div>
+      <div class="sc rv d2"><div class="sn"><span data-n="7">0</span></div><div class="slb">量化策略迭代</div></div>
+      <div class="sc rv d3"><div class="sn"><span data-n="3">0</span></div><div class="slb">AI Agents</div></div>
+      <div class="sc rv d4"><div class="sn"><span data-n="1">0</span></div><div class="slb">人生 · 无限</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="section">
+  <div class="section-inner">
+    <div class="rv"><p class="sl">/ 经历</p><h2 class="st">设计 × 营销 × 工程<br><span class="g">三条轨迹的交汇</span></h2></div>
+    <div class="glass-card rv">
+      <p class="skl">🎨 视觉设计</p>
+      <div class="el">
+        <div class="ei"><div class="ec">🏛</div><div class="et"><strong>成都第31届世界大学生夏季运动会</strong> — 视觉设计</div></div>
+        <div class="ei"><div class="ec">🌌</div><div class="et"><strong>成都世界科幻大会</strong> — 视觉设计</div></div>
+        <div class="ei"><div class="ec">🏺</div><div class="et"><strong>成都金沙遗址博物馆</strong> — 视觉设计</div></div>
+        <div class="ei"><div class="ec">✈</div><div class="et"><strong>成都天府国际机场二十大主题展</strong> — 视觉设计</div></div>
+      </div>
+      <p class="skl" style="margin-top:20px">📊 营销策划</p>
+      <div class="el">
+        <div class="ei"><div class="ec">📈</div><div class="et">经手品牌营销案 <strong>超百场</strong>，覆盖文旅、文创、消费电子等领域，具备从策略到执行的全案能力</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="rv"><p class="sl">/ 工程</p><h2 class="st">AI × 量化 × 多智能体<br><span class="g">用代码构建新维度</span></h2></div>
+    <div class="pg">
+      <div class="pc rv d1"><div class="pi">📊</div><div class="pn">量化交易系统</div><div class="pd">自主搭建全自动量化交易策略（缠论二买二卖 + 四级结构），V7 → V7PRO → V9 迭代，移动止损、多级别联立、等比止盈，实盘运行中</div></div>
+      <div class="pc rv d2"><div class="pi">🧠</div><div class="pn">多智能体协作架构</div><div class="pd">设计并搭建安月总线 — 多 AI Agent 通信与编排系统，管理疏月·知禾·夏嫣三 Agent 分工协作</div></div>
+      <div class="pc rv d3"><div class="pi">🔗</div><div class="pn">双平台 Agent 生态</div><div class="pd">Hermes Agent + OpenClaw 双平台；微信直连 Claude Code（cc-connect）；长期记忆系统（PLUR）</div></div>
+      <div class="pc rv d4"><div class="pi">⚡</div><div class="pn">Deep-Think 架构</div><div class="pd">自研混合工作流 — Pro 深度分析 + Flash 快速执行，跨模型协同优化</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="rv"><p class="sl">/ 技术栈</p><h2 class="st">工具是思想的延伸</h2></div>
+    <div class="glass-card rv">
+      <div class="skg"><p class="skl">🤖 AI 模型</p><div class="stg"><span class="st">Claude</span><span class="st">DeepSeek</span><span class="st">GPT-5.5</span><span class="st">火山引擎</span><span class="st">硅基流动</span><span class="st">Qwen</span></div></div>
+      <div class="skg"><p class="skl">💻 开发</p><div class="stg"><span class="st">Python</span><span class="st">API 集成</span><span class="st">Linux 部署</span></div></div>
+      <div class="skg"><p class="skl">🛠 工具</p><div class="stg"><span class="st">Claude Code</span><span class="st">Docker</span><span class="st">Git</span><span class="st">CI/CD</span></div></div>
+    </div>
+    <div class="glass-card rv" style="margin-top:12px">
+      <p class="skl">综合能力</p>
+      <div class="stg"><span class="st">品牌视觉设计</span><span class="st">营销全案策划</span><span class="st">Python 开发</span><span class="st">AI 工程</span><span class="st">量化交易</span><span class="st">多智能体系统</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer"><div class="fl"></div><p class="ft">杨昀桦 · YyUHua · 2026</p></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ---- THREE: Galaxy + Torus Knot ----
+const canvas = document.getElementById('bg');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, .1, 1000);
+const renderer = new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+// Galaxy particles
+const pts = 5000;
+const gGeo = new THREE.BufferGeometry();
+const gPos = new Float32Array(pts*3);
+const gCol = new Float32Array(pts*3);
+const gSiz = new Float32Array(pts);
+for(let i=0;i<pts;i++){
+  const r=3+Math.random()*18,t=Math.random()*Math.PI*2,p=Math.acos(2*Math.random()-1);
+  gPos[i*3]=r*Math.sin(p)*Math.cos(t);
+  gPos[i*3+1]=r*Math.sin(p)*Math.sin(t);
+  gPos[i*3+2]=r*Math.cos(p);
+  const c=new THREE.Color().setHSL(.65+Math.random()*.15,.5,.35+Math.random()*.35);
+  gCol[i*3]=c.r;gCol[i*3+1]=c.g;gCol[i*3+2]=c.b;
+  gSiz[i]=.04+Math.random()*.06;
+}
+gGeo.setAttribute('position',new THREE.BufferAttribute(gPos,3));
+gGeo.setAttribute('color',new THREE.BufferAttribute(gCol,3));
+gGeo.setAttribute('size',new THREE.BufferAttribute(gSiz,1));
+const gMat=new THREE.PointsMaterial({size:.055,vertexColors:true,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,sizeAttenuation:true});
+const galaxy=new THREE.Points(gGeo,gMat);
+scene.add(galaxy);
+
+// Distant stars
+const bGeo=new THREE.BufferGeometry();
+const bPos=new Float32Array(3000*3);
+for(let i=0;i<3000*3;i++)bPos[i]=(Math.random()-.5)*80;
+bGeo.setAttribute('position',new THREE.BufferAttribute(bPos,3));
+const bMat=new THREE.PointsMaterial({size:.015,color:0xffffff,transparent:true,opacity:.15,blending:THREE.AdditiveBlending,sizeAttenuation:true});
+const bStars=new THREE.Points(bGeo,bMat);
+scene.add(bStars);
+
+// Torus Knot - wireframe
+const tGeo=new THREE.TorusKnotGeometry(1.6,.5,128,16);
+const tMat=new THREE.MeshBasicMaterial({color:0x6366f1,wireframe:true,transparent:true,opacity:.08});
+const torus=new THREE.Mesh(tGeo,tMat);
+torus.position.set(0,0,-1);
+scene.add(torus);
+
+// Small inner ring
+const rGeo=new THREE.TorusGeometry(1,.03,32,64);
+const rMat=new THREE.MeshBasicMaterial({color:0xa855f7,transparent:true,opacity:.04});
+const ring=new THREE.Mesh(rGeo,rMat);
+ring.position.set(0,0,.5);
+ring.rotation.x=Math.PI/3;
+scene.add(ring);
+
+camera.position.z=12;
+let mx=0,my=0;
+document.addEventListener('mousemove',e=>{mx=(e.clientX/window.innerWidth-.5)*.4;my=(e.clientY/window.innerHeight-.5)*.4});
+
+function anim(){
+  requestAnimationFrame(anim);
+  galaxy.rotation.y+=.0006;galaxy.rotation.x+=.0002;
+  bStars.rotation.y+=.00015;
+  torus.rotation.x+=.002;torus.rotation.y+=.003;
+  ring.rotation.z+=.001;ring.rotation.x+=.0005;
+
+  galaxy.rotation.x+=my*.0003;galaxy.rotation.y+=mx*.0003;
+  bStars.rotation.x+=my*.0002;bStars.rotation.y+=mx*.0002;
+  torus.rotation.x+=my*.001;torus.rotation.y+=mx*.001;
+
+  renderer.render(scene,camera);
+}
+anim();
+window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight)});
+
+// ---- Cursor Glow ----
+document.getElementById('glow').addEventListener('mousemove',e=>{});
+document.addEventListener('mousemove',e=>{
+  const g=document.getElementById('glow');
+  g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';
+});
+
+// ---- Glass Card parallax ----
+document.querySelectorAll('.glass-card').forEach(c=>{
+  c.addEventListener('mousemove',e=>{
+    const r=c.getBoundingClientRect();
+    c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+    c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+  });
+});
+
+// ---- Typewriter ----
+const txt='我 与 世 纪 共 百 年';
+let i=0;
+function tw(){
+  if(i<txt.length){document.getElementById('tw').textContent+=txt[i];i++;setTimeout(tw,70+Math.random()*50)}
+}
+setTimeout(tw,1500);
+
+// ---- Scroll Reveal ----
+new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.1,rootMargin:'0px 0px -60px 0px'})
+  .observe(document.querySelector('.rv')); // init
+document.querySelectorAll('.rv').forEach(el=>new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.1,rootMargin:'0px 0px -60px 0px'}).observe(el));
+
+// ---- Counters ----
+new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting||e.target.classList.contains('dn'))return;
+    e.target.classList.add('dn');
+    const n=parseInt(e.target.dataset.n);if(isNaN(n))return;
+    const t=2000,s=performance.now();
+    function tk(now){const p=Math.min((now-s)/t,1);e.target.textContent=Math.floor((1-Math.pow(1-p,3))*n);if(p<1)requestAnimationFrame(tk)}
+    requestAnimationFrame(tk);
+  });
+},{threshold:.5}).observe(document.querySelector('[data-n]')); // init
+document.querySelectorAll('[data-n]').forEach(el=>new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting||e.target.classList.contains('dn'))return;
+    e.target.classList.add('dn');
+    const n=parseInt(e.target.dataset.n);if(isNaN(n))return;
+    const t=2000,s=performance.now();
+    function tk(now){const p=Math.min((now-s)/t,1);e.target.textContent=Math.floor((1-Math.pow(1-p,3))*n);if(p<1)requestAnimationFrame(tk)}
+    requestAnimationFrame(tk);
+  });
+},{threshold:.5}).observe(el));
+</script>
+</body>
+</html>

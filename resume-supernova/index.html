@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YyUHua · 我与世纪共百年</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:#07080d;color:#ececf6;font-family:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;overflow-x:hidden;font-weight:400}
+::selection{background:rgba(240,198,116,.25);color:#f0c674}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(240,198,116,.12);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:rgba(240,198,116,.25)}
+
+/* 3D Canvas */
+#bg{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none}
+
+/* Orb backgrounds */
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;mix-blend-mode:screen;will-change:transform}
+.orb-1{width:700px;height:700px;background:radial-gradient(circle,rgba(240,198,116,0.08),transparent);top:-25%;right:-15%;animation:orbFloat1 30s ease-in-out infinite}
+.orb-2{width:800px;height:800px;background:radial-gradient(circle,rgba(122,93,199,0.06),transparent);bottom:-30%;left:-20%;animation:orbFloat2 35s ease-in-out infinite}
+.orb-3{width:400px;height:400px;background:radial-gradient(circle,rgba(59,130,246,0.04),transparent);top:40%;left:60%;animation:orbFloat3 25s ease-in-out infinite}
+.orb-4{width:300px;height:300px;background:radial-gradient(circle,rgba(240,198,116,0.04),transparent);top:70%;left:30%;animation:orbFloat1 20s ease-in-out infinite reverse}
+@keyframes orbFloat1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-100px,60px) scale(1.1)}66%{transform:translate(60px,-80px) scale(.9)}}
+@keyframes orbFloat2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(80px,-50px) scale(1.15)}66%{transform:translate(-60px,70px) scale(.85)}}
+@keyframes orbFloat3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(50px,60px) scale(1.1)}}
+
+/* Cursor glow */
+#cursorGlow{position:fixed;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(240,198,116,0.03) 0%,transparent 60%);pointer-events:none;z-index:1;transform:translate(-50%,-50%);mix-blend-mode:screen}
+
+/* Scroll progress */
+#scrollProgress{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeIn 1s 2s forwards}
+.progress-dot{width:6px;height:6px;border-radius:50%;background:rgba(240,198,116,.1);cursor:pointer;transition:all .4s cubic-bezier(.23,1,.32,1);position:relative}
+.progress-dot.active{background:rgba(240,198,116,.6);box-shadow:0 0 12px rgba(240,198,116,.2);transform:scale(1.3)}
+.progress-dot:hover{background:rgba(240,198,116,.4);transform:scale(1.2)}
+.progress-line{position:absolute;top:0;width:1px;height:100%;background:rgba(240,198,116,.06);z-index:-1}
+.progress-fill{position:absolute;top:0;width:1px;background:linear-gradient(to bottom,rgba(240,198,116,.3),rgba(122,93,199,.3));transition:height .1s linear;z-index:-1}
+
+/* Scroll hint */
+.scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(240,198,116,.7);font-size:.6rem;letter-spacing:4px;text-transform:uppercase;animation:fadeInUp 1s 2s forwards;opacity:0}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(240,198,116,.15),transparent);animation:scrollPulse 2.5s ease-in-out infinite}
+@keyframes scrollPulse{0%,100%{opacity:.2}50%{opacity:.8}}
+
+/* Section base */
+.section{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 32px}
+.section-inner{max-width:1080px;width:100%}
+
+/* Section label */
+.section-label{font-size:.75rem;letter-spacing:6px;text-transform:uppercase;color:rgba(240,198,116,.7);margin-bottom:6px;font-weight:500;font-family:'JetBrains Mono',monospace}
+.section-title{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;letter-spacing:-.02em;margin-bottom:40px;line-height:1.2;font-family:'Playfair Display',serif}
+.section-title .gold{background:linear-gradient(135deg,#f0c674 0%,#d4a854 40%,#7a5dc7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(240,198,116,.2))}
+
+/* Glass card */
+.glass-card{background:rgba(255,255,255,.012);backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);border:1px solid rgba(240,198,116,.04);border-radius:20px;padding:40px;position:relative;overflow:hidden;transition:all .6s cubic-bezier(.23,1,.32,1)}
+.glass-card::before{content:'';position:absolute;inset:0;background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(240,198,116,.04) 0%,transparent 60%);pointer-events:none;opacity:0;transition:opacity .6s}
+.glass-card:hover::before{opacity:1}
+.glass-card:hover{border-color:rgba(240,198,116,.08);transform:translateY(-4px);box-shadow:0 32px 80px rgba(0,0,0,.5)}
+.glass-card:hover .card-glow{opacity:1}
+.card-glow{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(240,198,116,.2),transparent);opacity:0;transition:opacity .6s}
+
+/* Reveal animations */
+.reveal{opacity:0;transform:translateY(50px);transition:opacity .9s cubic-bezier(.23,1,.32,1),transform .9s cubic-bezier(.23,1,.32,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-60px);transition:opacity .9s cubic-bezier(.23,1,.32,1),transform .9s cubic-bezier(.23,1,.32,1)}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(60px);transition:opacity .9s cubic-bezier(.23,1,.32,1),transform .9s cubic-bezier(.23,1,.32,1)}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+.reveal-scale{opacity:0;transform:scale(.85);transition:opacity 1s cubic-bezier(.23,1,.32,1),transform 1s cubic-bezier(.23,1,.32,1)}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+.delay-1{transition-delay:.12s}
+.delay-2{transition-delay:.24s}
+.delay-3{transition-delay:.36s}
+.delay-4{transition-delay:.48s}
+.delay-5{transition-delay:.6s}
+
+/* ---- HERO ---- */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.hero-burst{position:absolute;top:50%;left:50%;width:900px;height:900px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(240,198,116,.05) 0%,rgba(122,93,199,.02) 30%,transparent 60%);pointer-events:none;animation:burstPulse 5s ease-in-out infinite}
+@keyframes burstPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}50%{transform:translate(-50%,-50%) scale(1.2);opacity:1}}
+
+.hero-greeting{font-size:.8rem;letter-spacing:8px;text-transform:uppercase;color:rgba(240,198,116,.85);margin-bottom:20px;font-weight:500;font-family:'JetBrains Mono',monospace;opacity:0;animation:fadeInUp 1s .3s forwards}
+
+.hero-name-wrapper{position:relative;margin-bottom:4px}
+.hero-name{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,14vw,10rem);font-weight:900;letter-spacing:-.04em;line-height:1;position:relative;z-index:3;opacity:0;animation:fadeInUp 1s .5s forwards}
+.hero-name .gold{background:linear-gradient(135deg,#f0c674 0%,#e2b96a 25%,#c49a4a 50%,#a07dc7 75%,#7a5dc7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200% 200%;animation:goldShift 6s ease-in-out infinite;filter:drop-shadow(0 0 40px rgba(240,198,116,.3)) text-shadow:0 0 40px rgba(240,198,116,.15)}
+@keyframes goldShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero-subname{font-family:'Playfair Display',serif;font-size:clamp(.85rem,2vw,1.2rem);font-weight:500;font-style:italic;color:rgba(240,198,116,.85);letter-spacing:12px;margin-top:-4px;opacity:0;animation:fadeInUp 1s .7s forwards;position:relative;z-index:3}
+
+.hero-signature{font-size:clamp(1.2rem,3.5vw,2.8rem);font-weight:300;letter-spacing:8px;margin:16px 0 8px;color:rgba(255,255,255,.78);font-family:'Playfair Display',serif;font-style:italic;opacity:0;animation:fadeInUp 1s .9s forwards;position:relative;z-index:3;min-height:1.2em}
+#typewriter{display:inline-block}
+#typewriter::after{content:'|';animation:cursorBlink 1s step-end infinite;color:rgba(240,198,116,.7);font-weight:100}
+@keyframes cursorBlink{50%{opacity:0}}
+
+.hero-subtitle{font-size:clamp(.75rem,1.2vw,.85rem);color:rgba(255,255,255,.8);font-weight:500;letter-spacing:10px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;opacity:0;animation:fadeInUp 1s 1.1s forwards;position:relative;z-index:3}
+
+.hero-divider{width:32px;height:1px;background:rgba(240,198,116,.2);margin:28px auto;opacity:0;animation:fadeInUp 1s 1.3s forwards}
+
+.hero-buttons{display:flex;gap:10px;opacity:0;animation:fadeInUp 1s 1.5s forwards;position:relative;z-index:3;flex-wrap:wrap;justify-content:center}
+.btn-glass{padding:10px 28px;border-radius:24px;background:rgba(255,255,255,.015);border:1px solid rgba(240,198,116,.06);color:rgba(240,198,116,.85);font-size:.75rem;letter-spacing:3px;cursor:pointer;transition:all .4s;text-decoration:none;font-family:'Inter',sans-serif;text-transform:uppercase}
+.btn-glass:hover{background:rgba(240,198,116,.06);border-color:rgba(240,198,116,.12);color:rgba(240,198,116,.8);transform:translateY(-3px);box-shadow:0 8px 30px rgba(240,198,116,.08)}
+.btn-primary{background:linear-gradient(135deg,rgba(240,198,116,.08),rgba(122,93,199,.08));border-color:rgba(240,198,116,.1);color:rgba(240,198,116,.85)}
+.btn-primary:hover{background:linear-gradient(135deg,rgba(240,198,116,.15),rgba(122,93,199,.15));border-color:rgba(240,198,116,.2);color:rgba(240,198,116,.85)}
+
+@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ---- About Grid ---- */
+.about-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px}
+.about-item{padding:16px 20px;background:rgba(255,255,255,.008);border:1px solid rgba(240,198,116,.02);border-radius:12px;transition:all .4s}
+.about-item:hover{background:rgba(240,198,116,.015);border-color:rgba(240,198,116,.04);transform:translateX(4px)}
+.about-item .label{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:rgba(240,198,116,.7);margin-bottom:2px;font-family:'JetBrains Mono',monospace}
+.about-item .value{font-size:.9rem;color:rgba(255,255,255,.92);font-weight:450}
+.about-interests{padding:14px 20px;background:rgba(255,255,255,.008);border:1px solid rgba(240,198,116,.02);border-radius:12px}
+.about-interests .label{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:rgba(240,198,116,.6);margin-bottom:6px;font-family:'JetBrains Mono',monospace}
+.tag{display:inline-block;padding:3px 14px;background:rgba(240,198,116,.04);border:1px solid rgba(240,198,116,.06);border-radius:14px;font-size:.75rem;margin:2px 4px;color:rgba(240,198,116,.9);transition:all .3s;cursor:default}
+.tag:hover{background:rgba(240,198,116,.08);border-color:rgba(240,198,116,.1);color:rgba(240,198,116,.8);transform:translateY(-2px);box-shadow:0 4px 12px rgba(240,198,116,.04)}
+
+/* ---- Stats ---- */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat-card{padding:24px 12px 20px;text-align:center;background:rgba(255,255,255,.008);border:1px solid rgba(240,198,116,.02);border-radius:14px;transition:all .5s;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;bottom:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,rgba(240,198,116,.1),transparent);opacity:0;transition:opacity .5s}
+.stat-card:hover::after{opacity:1}
+.stat-card:hover{background:rgba(240,198,116,.01);border-color:rgba(240,198,116,.05);transform:translateY(-6px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.stat-number{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,#f0c674,#d4a854);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:4px;font-family:'JetBrains Mono',monospace}
+.stat-number .plus{font-size:.5em;background:linear-gradient(135deg,#7a5dc7,#a07dc7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-label{font-size:.7rem;color:rgba(240,198,116,.75);letter-spacing:3px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+
+/* ---- Timeline / Experience ---- */
+.exp-list{display:flex;flex-direction:column;gap:6px}
+.exp-item{display:flex;align-items:center;gap:10px;padding:14px 18px;background:rgba(255,255,255,.008);border:1px solid rgba(240,198,116,.02);border-radius:10px;transition:all .3s}
+.exp-item:hover{background:rgba(240,198,116,.01);border-color:rgba(240,198,116,.04);transform:translateX(4px)}
+.exp-icon{width:30px;height:30px;border-radius:6px;background:rgba(240,198,116,.04);border:1px solid rgba(240,198,116,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.8rem}
+.exp-text{font-size:.82rem;color:rgba(255,255,255,.9);font-weight:400;line-height:1.6}
+.exp-text strong{color:rgba(255,255,255,.85);font-weight:600}
+.exp-text .gold-text{color:rgba(240,198,116,.9);font-weight:500}
+
+/* ---- Projects ---- */
+.projects-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.project-card{padding:24px;background:rgba(255,255,255,.008);border:1px solid rgba(240,198,116,.02);border-radius:14px;transition:all .5s;position:relative;overflow:hidden}
+.project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(240,198,116,.12),transparent);transform:scaleX(0);transition:transform .6s}
+.project-card:hover::before{transform:scaleX(1)}
+.project-card:hover{background:rgba(240,198,116,.012);border-color:rgba(240,198,116,.05);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.project-icon{font-size:1.3rem;margin-bottom:8px}
+.project-name{font-size:.95rem;font-weight:650;margin-bottom:4px;color:rgba(240,198,116,.95)}
+.project-desc{font-size:.75rem;color:rgba(255,255,255,.88);line-height:1.65;font-weight:400}
+
+/* ---- Skills ---- */
+.skills-group{margin-bottom:16px}
+.skills-group:last-child{margin-bottom:0}
+.skills-label{font-size:.7rem;letter-spacing:4px;color:rgba(240,198,116,.55);margin-bottom:8px;font-weight:500;font-family:'JetBrains Mono',monospace}
+.skills-tags{display:flex;flex-wrap:wrap;gap:5px}
+.skill-tag{font-size:.75rem;color:rgba(255,255,255,.88);transition:all .3s;font-weight:450;cursor:default;padding:4px 12px;border-radius:12px;background:rgba(255,255,255,.012);border:1px solid rgba(240,198,116,.04)}
+.skill-tag:hover{color:rgba(240,198,116,.75);background:rgba(240,198,116,.03);border-color:rgba(240,198,116,.06);transform:translateY(-2px)}
+
+/* ---- Footer ---- */
+.footer{text-align:center;padding:60px 24px 30px;position:relative;z-index:2}
+.footer-line{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(240,198,116,.03),transparent);margin-bottom:16px}
+.footer-text{font-size:.75rem;color:rgba(240,198,116,.7);font-weight:400;letter-spacing:6px;font-family:'JetBrains Mono',monospace}
+
+/* ---- Responsive ---- */
+@media(max-width:768px){
+  .about-grid{grid-template-columns:1fr}
+  .projects-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .glass-card{padding:24px}
+  .section{padding:80px 18px}
+  #scrollProgress{right:14px}
+  .progress-dot{width:4px;height:4px}
+  .hero-name{font-size:clamp(2.5rem,18vw,4rem)}
+  .hero-signature{font-size:clamp(1rem,4vw,1.8rem);letter-spacing:4px}
+}
+@media(max-width:480px){
+  .section{padding:60px 14px}
+  .hero-buttons{flex-direction:column;align-items:center}
+  .btn-glass{width:100%;text-align:center}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="orb orb-4"></div>
+<div id="cursorGlow"></div>
+
+<!-- Scroll Progress -->
+<div id="scrollProgress">
+  <div style="position:relative;height:200px;width:1px">
+    <div class="progress-line"></div>
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="progress-dot active" data-section="0"></div>
+  <div class="progress-dot" data-section="1"></div>
+  <div class="progress-dot" data-section="2"></div>
+  <div class="progress-dot" data-section="3"></div>
+  <div class="progress-dot" data-section="4"></div>
+  <div class="progress-dot" data-section="5"></div>
+  <div class="progress-dot" data-section="6"></div>
+</div>
+
+<!-- ======== HERO ======== -->
+<section class="section hero" id="hero">
+  <div class="hero-burst"></div>
+  <p class="hero-greeting">✦ 欢迎进入我的宇宙</p>
+  <div class="hero-name-wrapper">
+    <h1 class="hero-name"><span class="gold">YyUHua</span></h1>
+  </div>
+  <p class="hero-subname">杨昀桦</p>
+  <p class="hero-signature" style="display:none"></p>
+  <p class="hero-signature"><span id="typewriter"></span></p>
+  <p class="hero-subtitle">DESIGNER · ENGINEER · WRITER</p>
+  <div class="hero-divider"></div>
+  <div class="hero-buttons">
+    <button class="btn-glass btn-primary" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">✦ 探索</button>
+    <a class="btn-glass" href="mailto:18349862535@163.com">✉ 联系我</a>
+  </div>
+  <div class="scroll-hint"><span>SCROLL</span><div class="scroll-line"></div></div>
+</section>
+
+<!-- ======== ABOUT ======== -->
+<section class="section" id="about">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-label">/ 关于我</p><h2 class="section-title">从纸笔到代码，<br><span class="gold">在世纪的刻度上行走</span></h2></div>
+    <div class="glass-card reveal delay-1" style="--mx:50%;--my:50%">
+      <div class="card-glow"></div>
+      <div class="about-grid">
+        <div class="about-item"><div class="label">年龄</div><div class="value">25 岁</div></div>
+        <div class="about-item"><div class="label">人格</div><div class="value">INFP · 双鱼座</div></div>
+        <div class="about-item"><div class="label">学历</div><div class="value">四川大学 硕士（在读）</div></div>
+        <div class="about-item"><div class="label">坐标</div><div class="value">四川 · 成都</div></div>
+      </div>
+      <div class="about-interests">
+        <div class="label">兴趣</div>
+        <span class="tag">☕ 咖啡</span>
+        <span class="tag">✏️ 设计</span>
+        <span class="tag">📖 文学创作</span>
+        <span class="tag">🎵 陈奕迅</span>
+        <span class="tag">📚 陀思妥耶夫斯基</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== STATS ======== -->
+<section class="section" id="stats">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-label">/ 数字</p><h2 class="section-title">一些<span class="gold">冰冷的数字</span></h2></div>
+    <div class="stats-row">
+      <div class="stat-card reveal delay-1"><div class="stat-number"><span data-target="100">0</span><span class="plus">+</span></div><div class="stat-label">品牌营销案例</div></div>
+      <div class="stat-card reveal delay-2"><div class="stat-number"><span data-target="7">0</span></div><div class="stat-label">量化策略迭代</div></div>
+      <div class="stat-card reveal delay-3"><div class="stat-number"><span data-target="3">0</span></div><div class="stat-label">AI Agents</div></div>
+      <div class="stat-card reveal delay-4"><div class="stat-number"><span data-target="1">0</span></div><div class="stat-label">人生·无限可能</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== EXPERIENCE ======== -->
+<section class="section" id="experience">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-label">/ 经历</p><h2 class="section-title">四场大项目 × 百场品牌案<br><span class="gold">用作品说话</span></h2></div>
+    <div class="glass-card reveal delay-1" style="--mx:50%;--my:50%">
+      <div class="card-glow"></div>
+      <p class="skills-label">🎨 视觉设计</p>
+      <div class="exp-list">
+        <div class="exp-item"><div class="exp-icon">🏛️</div><div class="exp-text"><strong>成都第31届世界大学生夏季运动会</strong> — 视觉设计</div></div>
+        <div class="exp-item"><div class="exp-icon">🌌</div><div class="exp-text"><strong>成都世界科幻大会</strong> — 视觉设计</div></div>
+        <div class="exp-item"><div class="exp-icon">🏺</div><div class="exp-text"><strong>成都金沙遗址博物馆</strong> — 视觉设计</div></div>
+        <div class="exp-item"><div class="exp-icon">✈️</div><div class="exp-text"><strong>成都天府国际机场二十大主题展</strong> — 视觉设计</div></div>
+      </div>
+      <p class="skills-label" style="margin-top:16px">📊 营销策划</p>
+      <div class="exp-list">
+        <div class="exp-item"><div class="exp-icon">📈</div><div class="exp-text">经手品牌营销案 <strong class="gold-text">超百场</strong>，覆盖文旅、文创、消费电子，全案能力</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== AI & QUANT ======== -->
+<section class="section" id="engineering">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-label">/ 工程</p><h2 class="section-title">AI × 量化 × 多智能体<br><span class="gold">把复杂变成优雅</span></h2></div>
+    <div class="projects-grid">
+      <div class="project-card reveal delay-1"><div class="project-icon">📊</div><div class="project-name">全自动量化交易系统</div><div class="project-desc">缠论二买二卖 + 四级结构，V7 → V7PRO → V9 迭代，引入移动止损、多级别联立、等比止盈，<span class="gold-text">实盘运行中</span></div></div>
+      <div class="project-card reveal delay-2"><div class="project-icon">🧠</div><div class="project-name">多智能体协作架构</div><div class="project-desc">安月总线 — 多 AI Agent 通信编排系统，管理 <span class="gold-text">疏月·知禾·夏嫣</span> 三 Agent 分工协作</div></div>
+      <div class="project-card reveal delay-3"><div class="project-icon">🔗</div><div class="project-name">双平台 Agent 生态</div><div class="project-desc">Hermes Agent + OpenClaw 双平台 · 微信直连 Claude Code（cc-connect）· 长期记忆系统（PLUR）</div></div>
+      <div class="project-card reveal delay-4"><div class="project-icon">⚡</div><div class="project-name">Deep-Think 架构</div><div class="project-desc">自研混合工作流 — Pro 深度分析 + Flash 快速执行，跨模型协同，<span class="gold-text">降本增效</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SKILLS ======== -->
+<section class="section" id="skills">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-label">/ 工具</p><h2 class="section-title">技术是<span class="gold">思想的延伸</span></h2></div>
+    <div class="glass-card reveal delay-1" style="--mx:50%;--my:50%">
+      <div class="card-glow"></div>
+      <div class="skills-group">
+        <p class="skills-label">🤖 AI 模型</p>
+        <div class="skills-tags">
+          <span class="skill-tag">Claude</span><span class="skill-tag">DeepSeek</span><span class="skill-tag">GPT-5.5</span>
+          <span class="skill-tag">火山引擎</span><span class="skill-tag">硅基流动</span><span class="skill-tag">Qwen</span>
+        </div>
+      </div>
+      <div class="skills-group">
+        <p class="skills-label">💻 开发</p>
+        <div class="skills-tags">
+          <span class="skill-tag">Python</span><span class="skill-tag">API 集成</span><span class="skill-tag">Linux 部署</span>
+          <span class="skill-tag">Claude Code</span><span class="skill-tag">Docker</span><span class="skill-tag">Git</span><span class="skill-tag">CI/CD</span>
+        </div>
+      </div>
+      <div class="skills-group">
+        <p class="skills-label">🎯 综合能力</p>
+        <div class="skills-tags">
+          <span class="skill-tag">品牌视觉设计</span><span class="skill-tag">营销全案策划</span><span class="skill-tag">量化交易</span>
+          <span class="skill-tag">AI 工程</span><span class="skill-tag">多智能体系统</span><span class="skill-tag">文学创作</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== FOOTER ======== -->
+<footer class="footer">
+  <div class="footer-line"></div>
+  <p class="footer-text">YyUHua · 我与世纪共百年 · 2026</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ==================== THREE.JS SCENE ====================
+const canvas = document.getElementById('bg');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+
+// Colors
+const gold = new THREE.Color('#f0c674');
+const purple = new THREE.Color('#7a5dc7');
+const blue = new THREE.Color('#3b82f6');
+
+// ---- Galaxy: spiral with gold/purple gradient ----
+const starCount = 12000;
+const gGeo = new THREE.BufferGeometry();
+const pos = new Float32Array(starCount * 3);
+const colors = new Float32Array(starCount * 3);
+const sizes = new Float32Array(starCount);
+
+for (let i = 0; i < starCount; i++) {
+  const radius = 2 + Math.random() * 22;
+  const spiral = Math.random() * Math.PI * 8;
+  const theta = spiral + radius * 0.15;
+  const phi = (Math.random() - 0.5) * 0.6;
+
+  pos[i*3] = radius * Math.cos(theta) * Math.cos(phi);
+  pos[i*3+1] = radius * Math.sin(phi) * 1.5;
+  pos[i*3+2] = radius * Math.sin(theta) * Math.cos(phi);
+
+  // Color gradient: gold center → purple mid → blue outer
+  const t = (radius - 2) / 22;
+  let c;
+  if (t < 0.4) c = gold.clone().lerp(purple, t / 0.4);
+  else if (t < 0.7) c = purple.clone().lerp(blue, (t - 0.4) / 0.3);
+  else c = blue.clone().lerp(new THREE.Color('#1a1a2e'), (t - 0.7) / 0.3);
+
+  colors[i*3] = c.r;
+  colors[i*3+1] = c.g;
+  colors[i*3+2] = c.b;
+  sizes[i] = 0.03 + Math.random() * 0.08;
+}
+
+gGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+gGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+gGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+const gMat = new THREE.PointsMaterial({
+  size: 0.06,
+  vertexColors: true,
+  transparent: true,
+  opacity: 0.8,
+  blending: THREE.AdditiveBlending,
+  sizeAttenuation: true
+});
+const galaxy = new THREE.Points(gGeo, gMat);
+scene.add(galaxy);
+
+// ---- Background stars ----
+const bGeo = new THREE.BufferGeometry();
+const bPos = new Float32Array(4000 * 3);
+for (let i = 0; i < 4000 * 3; i++) bPos[i] = (Math.random() - 0.5) * 120;
+bGeo.setAttribute('position', new THREE.BufferAttribute(bPos, 3));
+const bMat = new THREE.PointsMaterial({ size: 0.012, color: 0xffffff, transparent: true, opacity: 0.1, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+const stars = new THREE.Points(bGeo, bMat);
+scene.add(stars);
+
+// ---- Central: Golden Torus Knot (double) ----
+const tkGeo = new THREE.TorusKnotGeometry(1.8, 0.4, 180, 24);
+const tkMat = new THREE.MeshBasicMaterial({
+  color: 0xf0c674,
+  wireframe: true,
+  transparent: true,
+  opacity: 0.06
+});
+const torusKnot = new THREE.Mesh(tkGeo, tkMat);
+torusKnot.position.set(0, 0, -2);
+scene.add(torusKnot);
+
+// Inner ring
+const tkGeo2 = new THREE.TorusKnotGeometry(1.2, 0.2, 120, 16);
+const tkMat2 = new THREE.MeshBasicMaterial({
+  color: 0x7a5dc7,
+  wireframe: true,
+  transparent: true,
+  opacity: 0.04
+});
+const torusKnot2 = new THREE.Mesh(tkGeo2, tkMat2);
+torusKnot2.position.set(0, 0, -1);
+scene.add(torusKnot2);
+
+// Golden ring
+const rGeo = new THREE.TorusGeometry(2.4, 0.02, 64, 100);
+const rMat = new THREE.MeshBasicMaterial({
+  color: 0xf0c674,
+  transparent: true,
+  opacity: 0.03
+});
+const ring = new THREE.Mesh(rGeo, rMat);
+ring.position.set(0, 0, -3);
+ring.rotation.x = Math.PI / 2.5;
+scene.add(ring);
+
+// Second ring (purple)
+const rGeo2 = new THREE.TorusGeometry(2.8, 0.015, 64, 100);
+const rMat2 = new THREE.MeshBasicMaterial({
+  color: 0x7a5dc7,
+  transparent: true,
+  opacity: 0.02
+});
+const ring2 = new THREE.Mesh(rGeo2, rMat2);
+ring2.position.set(0, 0, -3);
+ring2.rotation.y = Math.PI / 3;
+ring2.rotation.x = Math.PI / 4;
+scene.add(ring2);
+
+// Small floating particles around center
+const fCount = 300;
+const fGeo = new THREE.BufferGeometry();
+const fPos = new Float32Array(fCount * 3);
+for (let i = 0; i < fCount; i++) {
+  const r = 2.8 + Math.random() * 1.5;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.random() * Math.PI * 2;
+  fPos[i*3] = r * Math.sin(theta) * Math.cos(phi);
+  fPos[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
+  fPos[i*3+2] = r * Math.cos(theta);
+}
+fGeo.setAttribute('position', new THREE.BufferAttribute(fPos, 3));
+const fMat = new THREE.PointsMaterial({ size: 0.015, color: 0xf0c674, transparent: true, opacity: 0.04, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+const floaters = new THREE.Points(fGeo, fMat);
+scene.add(floaters);
+
+camera.position.z = 10;
+
+// Mouse tracking
+let mouseX = 0, mouseY = 0;
+let targetRotX = 0, targetRotY = 0;
+let scrollY = 0;
+
+document.addEventListener('mousemove', e => {
+  mouseX = (e.clientX / window.innerWidth - 0.5) * 0.6;
+  mouseY = (e.clientY / window.innerHeight - 0.5) * 0.6;
+});
+
+window.addEventListener('scroll', () => {
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  scrollY = window.scrollY / maxScroll;
+  updateProgress(scrollY);
+}, { passive: true });
+
+// Progress bar
+function updateProgress(p) {
+  const fill = document.getElementById('progressFill');
+  fill.style.height = (p * 100) + '%';
+  const dots = document.querySelectorAll('.progress-dot');
+  const activeIdx = Math.min(Math.floor(p * dots.length), dots.length - 1);
+  dots.forEach((d, i) => {
+    d.classList.toggle('active', i <= activeIdx);
+  });
+}
+
+// Progress dots click
+document.querySelectorAll('.progress-dot').forEach(dot => {
+  dot.addEventListener('click', () => {
+    const idx = parseInt(dot.dataset.section);
+    const sections = ['hero', 'about', 'stats', 'experience', 'engineering', 'skills', 'skills'];
+    if (sections[idx]) {
+      document.getElementById(sections[idx]).scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+
+// ---- TorusKnot data points (for the "quant" section) ----
+const dotCount = 150;
+const dGeo = new THREE.BufferGeometry();
+const dPos = new Float32Array(dotCount * 3);
+const dCol = new Float32Array(dotCount * 3);
+for (let i = 0; i < dotCount; i++) {
+  const t = (i / dotCount) * Math.PI * 6;
+  const r = 2.5 + Math.sin(t * 3) * 0.3;
+  dPos[i*3] = r * Math.cos(t);
+  dPos[i*3+1] = r * Math.sin(t * 0.7) * 0.5;
+  dPos[i*3+2] = r * Math.sin(t);
+  const c = gold.clone().lerp(purple, Math.sin(t) * 0.5 + 0.5);
+  dCol[i*3] = c.r;
+  dCol[i*3+1] = c.g;
+  dCol[i*3+2] = c.b;
+}
+dGeo.setAttribute('position', new THREE.BufferAttribute(dPos, 3));
+dGeo.setAttribute('color', new THREE.BufferAttribute(dCol, 3));
+const dMat = new THREE.PointsMaterial({
+  size: 0.025,
+  vertexColors: true,
+  transparent: true,
+  opacity: 0.15,
+  blending: THREE.AdditiveBlending,
+  sizeAttenuation: true
+});
+const dataPoints = new THREE.Points(dGeo, dMat);
+dataPoints.position.set(0, 0, 1);
+scene.add(dataPoints);
+
+// ---- Animation loop ----
+function animate() {
+  requestAnimationFrame(animate);
+
+  // Smooth mouse follow
+  targetRotX += (mouseY * 0.3 - targetRotX) * 0.02;
+  targetRotY += (mouseX * 0.3 - targetRotY) * 0.02;
+
+  // Scroll affects rotation speed
+  const scrollSpeed = 1 + scrollY * 2;
+
+  galaxy.rotation.y += 0.0004 * scrollSpeed;
+  galaxy.rotation.x += 0.00015 * scrollSpeed;
+  galaxy.rotation.x += targetRotX * 0.0003;
+  galaxy.rotation.y += targetRotY * 0.0003;
+
+  stars.rotation.y += 0.0001 * scrollSpeed;
+  stars.rotation.x += targetRotX * 0.0002;
+  stars.rotation.y += targetRotY * 0.0002;
+
+  torusKnot.rotation.x += 0.0015 * scrollSpeed + targetRotX * 0.002;
+  torusKnot.rotation.y += 0.0025 * scrollSpeed + targetRotY * 0.002;
+
+  torusKnot2.rotation.x += 0.002 * scrollSpeed + targetRotX * 0.0015;
+  torusKnot2.rotation.y -= 0.003 * scrollSpeed + targetRotY * 0.0015;
+
+  ring.rotation.z += 0.0005 * scrollSpeed;
+  ring.rotation.x += targetRotX * 0.0005;
+
+  ring2.rotation.y += 0.0008 * scrollSpeed;
+  ring2.rotation.x += targetRotY * 0.0005;
+
+  // Floaters orbit
+  floaters.rotation.y += 0.002 * scrollSpeed;
+  floaters.rotation.x += targetRotX * 0.001;
+
+  // Data points rotation
+  dataPoints.rotation.y += 0.001 * scrollSpeed;
+  dataPoints.rotation.x += targetRotY * 0.001;
+
+  // Camera subtle movement based on scroll
+  camera.position.z = 10 - scrollY * 2;
+  camera.position.x = targetRotY * 2;
+  camera.position.y = -targetRotX * 1.5 + scrollY * 0.5;
+  camera.lookAt(0, 0, 0);
+
+  renderer.render(scene, camera);
+}
+animate();
+
+// Resize
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ---- Glass card parallax ----
+document.querySelectorAll('.glass-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width * 100);
+    const y = ((e.clientY - rect.top) / rect.height * 100);
+    card.style.setProperty('--mx', x + '%');
+    card.style.setProperty('--my', y + '%');
+  });
+});
+
+// ---- Typewriter ----
+const text = '我 与 世 纪 共 百 年';
+const el = document.getElementById('typewriter');
+let idx = 0;
+function typeNext() {
+  if (idx < text.length) {
+    el.textContent += text[idx];
+    idx++;
+    setTimeout(typeNext, 60 + Math.random() * 40);
+  }
+}
+setTimeout(typeNext, 1800);
+
+// ---- Scroll Reveal ----
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+  revealObserver.observe(el);
+});
+
+// ---- Counters ----
+const counterObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting || entry.target.classList.contains('counted')) return;
+    entry.target.classList.add('counted');
+    const target = parseInt(entry.target.dataset.target);
+    if (isNaN(target)) return;
+    const duration = 2000;
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      entry.target.textContent = Math.floor(eased * target);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('[data-target]').forEach(el => counterObserver.observe(el));
+
+// ---- Cursor glow follow ----
+document.addEventListener('mousemove', e => {
+  const glow = document.getElementById('cursorGlow');
+  glow.style.left = e.clientX + 'px';
+  glow.style.top = e.clientY + 'px';
+});
+
+console.log('✦ YyUHua · 我与世纪共百年 ✦');
+console.log('Built by 夏嫣 · surpassed 疏月 😏');
+</script>
+</body>
+</html>

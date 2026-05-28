@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人海报设计 · 杨昀桦</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f6f3ec;
+    --panel: rgba(255, 255, 255, 0.74);
+    --panel-strong: rgba(255, 255, 255, 0.9);
+    --text: #171717;
+    --text-soft: rgba(23, 23, 23, 0.66);
+    --line: rgba(255, 255, 255, 0.56);
+    --grid: rgba(124, 116, 103, 0.18);
+    --accent: #c84c35;
+    --shadow: 0 24px 64px rgba(34, 28, 20, 0.1);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(180deg, #f8f5ef 0%, #f3efe7 100%);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.48;
+    z-index: 0;
+  }
+
+  .grid-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size:
+      calc((100vw - 4rem) / 12) 100%,
+      100% 11.111vh;
+    background-position: 2rem 0, 0 0;
+    background-repeat: repeat-x, repeat-y;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+  }
+
+  .back-link,
+  .home-link {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .intro {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.6rem;
+    align-items: end;
+  }
+
+  .intro-copy {
+    grid-column: 1 / span 7;
+  }
+
+  .eyebrow,
+  .meta-chip,
+  .poster-note {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow,
+  .meta-chip,
+  .poster-note { color: var(--accent); }
+
+  .intro-copy h1 {
+    margin-top: 0.4rem;
+    font-size: clamp(3rem, 8vw, 5.8rem);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    margin-bottom: 1rem;
+  }
+
+  .intro-copy p {
+    max-width: 38rem;
+    font-size: 1rem;
+    color: var(--text-soft);
+  }
+
+  .intro-meta {
+    grid-column: 9 / span 4;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .meta-card,
+  .poster-stage,
+  .poster-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.8rem;
+    border: 1px solid var(--line);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.5)),
+      linear-gradient(135deg, rgba(255,255,255,0.36), rgba(255,255,255,0.12));
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+  }
+
+  .meta-card::before,
+  .poster-stage::before,
+  .poster-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.46), rgba(255,255,255,0.08) 45%, transparent 70%),
+      radial-gradient(circle at top left, rgba(255,255,255,0.82), transparent 34%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .meta-card > *,
+  .poster-stage > *,
+  .poster-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .meta-card {
+    width: min(100%, 21rem);
+    padding: 1.1rem 1.2rem;
+  }
+
+  .meta-card p {
+    font-size: 0.92rem;
+    color: var(--text-soft);
+  }
+
+  .poster-hero {
+    position: relative;
+    min-height: 76vh;
+    margin-bottom: 3rem;
+  }
+
+  .poster-stage {
+    position: relative;
+    min-height: 76vh;
+    padding: 1.4rem;
+  }
+
+  .poster-stage-inner {
+    position: relative;
+    min-height: calc(76vh - 2.8rem);
+    border-radius: 1.2rem;
+    background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(249,245,238,0.9));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
+    overflow: hidden;
+  }
+
+  .poster-dock-shell {
+    position: absolute;
+    left: 3rem;
+    right: 3rem;
+    top: 11%;
+    bottom: 9rem;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 1.5rem 0 2rem;
+  }
+
+  .poster-dock-shell::-webkit-scrollbar {
+    display: none;
+  }
+
+  .poster-dock {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.15rem;
+    padding: 0 1rem;
+    margin: 0 auto;
+  }
+
+  .poster-card {
+    position: relative;
+    flex: 0 0 auto;
+    width: clamp(11rem, 15vw, 14rem);
+    padding: 0.72rem;
+    border-radius: 1.55rem;
+    opacity: 0.72;
+    transform: scale(0.92);
+    transform-origin: center bottom;
+    transition:
+      transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.28s ease,
+      box-shadow 0.28s ease,
+      margin-bottom 0.28s ease;
+    cursor: pointer;
+  }
+
+  .poster-card:hover {
+    opacity: 1;
+    transform: scale(1.22);
+    box-shadow: 0 26px 56px rgba(34, 28, 20, 0.14);
+    z-index: 4;
+    margin-bottom: 1rem;
+  }
+
+  .poster-card img {
+    width: 100%;
+    display: block;
+    border-radius: 1.05rem;
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 18px 38px rgba(34, 28, 20, 0.08);
+  }
+
+  .poster-card.p1 { margin-bottom: 0.8rem; }
+  .poster-card.p2 { margin-bottom: 2.6rem; }
+  .poster-card.p3 { margin-bottom: 0.2rem; }
+  .poster-card.p4 { margin-bottom: 2.2rem; }
+  .poster-card.p5 { margin-bottom: 1rem; }
+  .poster-card.p6 { margin-bottom: 3rem; }
+
+  .poster-caption {
+    position: absolute;
+    left: 4.2rem;
+    right: 4.2rem;
+    bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    pointer-events: none;
+  }
+
+  .poster-caption h2 {
+    font-size: clamp(2rem, 4.4vw, 3.8rem);
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+    max-width: 8ch;
+  }
+
+  .poster-caption p {
+    max-width: 18rem;
+    font-size: 0.92rem;
+    color: rgba(23,23,23,0.6);
+    text-align: right;
+  }
+
+
+
+
+  .poster-wide-gallery {
+    width: min(100%, 980px);
+    margin: 0 auto 3.2rem;
+    display: grid;
+    gap: 1.35rem;
+  }
+
+  .poster-wide-gallery figure {
+    position: relative;
+    padding: 0.9rem;
+    border-radius: 1.5rem;
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(255,255,255,0.62);
+    box-shadow: 0 18px 42px rgba(34, 28, 20, 0.08);
+    backdrop-filter: blur(16px) saturate(135%);
+    -webkit-backdrop-filter: blur(16px) saturate(135%);
+  }
+
+  .poster-wide-gallery img {
+    width: 100%;
+    display: block;
+    border-radius: 1rem;
+  }
+
+  @media (max-width: 980px) {
+    .intro-copy,
+    .intro-meta {
+      grid-column: span 12;
+    }
+
+    .poster-stage,
+    .poster-stage-inner {
+      min-height: auto;
+    }
+
+    .poster-dock-shell {
+      position: relative;
+      left: auto;
+      right: auto;
+      top: auto;
+      bottom: auto;
+      overflow-x: auto;
+      padding: 1rem 1rem 0;
+    }
+
+    .poster-dock {
+      width: max-content;
+      margin: 0;
+    }
+
+    .poster-card {
+      width: 11rem;
+      margin-bottom: 0 !important;
+      opacity: 1;
+      transform: scale(1);
+      filter: none;
+    }
+
+    .poster-card:hover {
+      transform: scale(1.08);
+      margin-bottom: 0.4rem;
+    }
+
+    .poster-caption {
+      position: relative;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      padding: 1.2rem;
+      flex-direction: column;
+      align-items: flex-start;
+      pointer-events: auto;
+    }
+
+    .poster-caption p {
+      text-align: left;
+    }
+
+    .grid-overlay::before {
+      background-size: calc((100vw - 2rem) / 6) 100%, 100% 12.5vh;
+      background-position: 1rem 0, 0 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .page { padding: 1rem; }
+
+    .poster-dock {
+      padding-bottom: 0.6rem;
+    }
+  }
+  @media (max-width: 520px) {
+    .page { padding: 0.75rem; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+    .back-link, .home-link { font-size: 0.72rem; }
+    .intro-copy h1 { font-size: 2.2rem; }
+    .intro-copy p { font-size: 0.92rem; }
+    .poster-card { width: 8.5rem; }
+    .poster-caption h2 { font-size: 1.2rem; }
+    .poster-caption p { font-size: 0.86rem; }
+    .poster-wide-gallery { padding: 0.7rem; }
+  }
+</style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+<div class="page">
+  <div class="topbar">
+    <a class="back-link" href="./index.html#works">Back to Works</a>
+    <a class="home-link" href="./index.html">杨昀桦 / YyUHua</a>
+  </div>
+
+  <section class="intro">
+    <div class="intro-copy">
+      <div class="eyebrow">Personal Poster Practice · 2025</div>
+      <h1>个人海报设计</h1>
+      <p>海报练习作品，重点在版式秩序、留白控制与图文关系处理。可独立完成从画面构思到视觉呈现的整套表达。</p>
+    </div>
+    <div class="intro-meta">
+      <div class="meta-card">
+        <div class="meta-chip">Poster Selection / 06</div>
+        <p>包含实验性排版、黑白视觉与主题海报表达，适合作为个人视觉风格与版式能力的补充展示。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="poster-hero">
+    <div class="poster-stage">
+      <div class="poster-stage-inner">
+        <div class="poster-dock-shell" aria-label="个人海报作品列表">
+          <div class="poster-dock" aria-hidden="true">
+          <figure class="poster-card p1"><img src="./assets/poster-01.JPG" alt="个人海报设计作品 1"></figure>
+          <figure class="poster-card p2"><img src="./assets/poster-02.JPG" alt="个人海报设计作品 2"></figure>
+          <figure class="poster-card p3"><img src="./assets/poster-03.JPG" alt="个人海报设计作品 3"></figure>
+          <figure class="poster-card p4"><img src="./assets/poster-04.JPG" alt="个人海报设计作品 4"></figure>
+          <figure class="poster-card p5"><img src="./assets/poster-05.JPG" alt="个人海报设计作品 5"></figure>
+          <figure class="poster-card p6"><img src="./assets/poster-06.JPG" alt="个人海报设计作品 6"></figure>
+          </div>
+        </div>
+        <div class="poster-caption">
+          <div>
+            <div class="poster-note">Manual Dock / Hover Zoom</div>
+            <h2>个人海报设计作品</h2>
+          </div>
+          <p>涵盖文字编排、图像裁切与画面情绪控制。</p>
+        </div>
+      </div>
+    </div>
+  <section class="poster-wide-gallery">
+    <figure>
+      <img src="./assets/poster-wide-01.jpg" alt="个人海报设计横版作品 1">
+    </figure>
+    <figure>
+      <img src="./assets/poster-wide-02.jpg" alt="个人海报设计横版作品 2">
+    </figure>
+    <figure>
+      <img src="./assets/poster-wide-03.jpg" alt="个人海报设计横版作品 3">
+    </figure>
+  </section>
+</div>
+</body>
+</html>

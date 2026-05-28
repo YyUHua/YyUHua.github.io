@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>杨昀桦 · 持续做事的记录</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:#1a1010;color:#f5f5f5;
+  font-family:'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  font-weight:400;
+  font-size:clamp(.95rem,1.3vw,1.1rem);
+  line-height:1.8;
+}
+::selection{background:rgba(255,77,77,.35);color:#fff}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,77,77,.25);border-radius:4px}
+
+/* ===== UTILITY ===== */
+.r{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.23,1,.32,1),transform .8s cubic-bezier(.23,1,.32,1)}
+.r.v{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.15s}.d2{transition-delay:.3s}.d3{transition-delay:.45s}.d4{transition-delay:.6s}
+
+.section-label{
+  font-family:'JetBrains Mono',monospace;font-size:.75rem;letter-spacing:8px;
+  color:rgba(255,77,77,.75);margin-bottom:12px;font-weight:400;
+}
+
+/* ===== SECTION DECORATION ===== */
+.section-top-deco{
+  width:32px;height:2px;background:#582828;margin-top:12px;margin-bottom:40px;opacity:.5;
+}
+
+/* ===== NAV ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;padding:24px 48px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:linear-gradient(180deg,rgba(26,16,16,.95),transparent);
+}
+.nav-logo{font-size:.8rem;font-weight:500;color:#e0e0e0;letter-spacing:4px;font-family:'JetBrains Mono',monospace}
+.nav-links{display:flex;gap:24px}
+.nav-links a{font-size:.8rem;letter-spacing:4px;text-transform:uppercase;color:rgba(240,240,240,.7);text-decoration:none;transition:color .3s}
+.nav-links a:hover{color:rgba(255,77,77,.7)}
+
+/* ===== HERO ===== */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:40px 48px 40px 72px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#1a1010 0%,#141010 50%,#1a1010 100%);
+}
+.hero::before{
+  content:'';position:absolute;top:-40%;left:-20%;width:80%;height:100%;
+  background:radial-gradient(ellipse at center,rgba(88,40,40,.12),transparent 70%);
+  pointer-events:none;
+}
+.hero-line{position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,transparent,rgba(255,77,77,.25),transparent)}
+.hero-name{
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(.75rem,1vw,.85rem);
+  letter-spacing:8px;
+  color:rgba(88,40,40,.7);
+  margin-bottom:12px;
+  font-weight:400;
+  text-transform:uppercase;
+}
+.hero h1{
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(3.5rem,14vw,9rem);font-weight:700;line-height:.9;
+  letter-spacing:-.06em;color:#f0f0f0;margin-bottom:20px;
+  text-shadow:0 0 60px rgba(88,40,40,.5),0 0 120px rgba(88,40,40,.25);
+}
+.hero h1 .hl{color:rgba(255,77,77,.75)}
+.hero p{
+  font-size:clamp(.95rem,1.4vw,1.15rem);color:rgba(240,240,240,.85);font-weight:400;
+  max-width:560px;letter-spacing:1px;line-height:1.8;
+}
+.hero-metrics{
+  position:absolute;right:60px;top:50%;transform:translateY(-50%);
+  text-align:right;display:flex;flex-direction:column;gap:24px;
+  background:rgba(88,40,40,.08);padding:32px 36px;border:1px solid rgba(88,40,40,.12);
+}
+.hero-metric .num{font-family:'JetBrains Mono',monospace;font-size:clamp(1.4rem,2.8vw,2.4rem);font-weight:500;color:#f0f0f0}
+.hero-metric .lbl{font-size:.6rem;letter-spacing:4px;text-transform:uppercase;color:rgba(240,240,240,.5);font-weight:400}.hero-metric .num .r_hl{color:#ff4d4d}
+.hero-scroll{position:absolute;bottom:28px;left:72px;font-size:.8rem;letter-spacing:10px;color:rgba(255,77,77,.5);font-family:'JetBrains Mono',monospace}
+
+/* ===== SECTION ===== */
+.section{padding:160px 48px;position:relative}
+.section-inner{max-width:1200px;margin:0 auto;position:relative}
+
+/* ===== TIMELINE ===== */
+.section-timeline{background:#160e0e}
+.tl-wrap{position:relative;padding:20px 0}
+.tl-line{position:absolute;left:28px;top:0;bottom:0;width:1px;background:rgba(88,40,40,.25)}
+.tl-item{position:relative;padding:28px 0 28px 68px;border-bottom:1px solid rgba(88,40,40,.06)}
+.tl-item:last-child{border-bottom:none}
+.tl-dot{position:absolute;left:20px;top:32px;width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,77,77,.35);background:#160e0e;z-index:2;transition:all .4s}
+.tl-item:hover .tl-dot{background:#ff4d4d;box-shadow:0 0 20px rgba(255,77,77,.3);border-color:#ff4d4d;transform:scale(1.3)}
+.tl-year{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:rgba(255,77,77,.35);letter-spacing:6px;margin-bottom:4px}
+.tl-title{font-size:clamp(.95rem,1.5vw,1.2rem);font-weight:500;color:#f0f0f0;margin-bottom:4px}
+.tl-title .hl{color:#ff4d4d;font-weight:500}
+.tl-sub{font-size:.8rem;color:rgba(240,240,240,.75);font-weight:400}
+.tl-stat{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:rgba(255,77,77,.65);margin-top:4px}
+
+/* ===== TRADING ===== */
+.tr-section{background:linear-gradient(180deg,#141010,#100e0e 100%)}
+.tr-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:start}
+.chart-area{position:relative}
+.chart-area .tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:6px;color:rgba(255,77,77,.25);margin-bottom:20px}
+.chart-svg{width:100%;height:auto;background:transparent}
+.tr-metrics{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(88,40,40,.15)}
+.tr-metric{padding:32px 28px;text-align:center;position:relative;background:#141010}
+.tr-metric:nth-child(-n+2){border-bottom:1px solid rgba(88,40,40,.08)}
+.tr-metric:nth-child(odd){border-right:1px solid rgba(88,40,40,.08)}
+.tr-metric .val{font-family:'JetBrains Mono',monospace;font-size:clamp(1.6rem,3.2vw,2.6rem);font-weight:500;color:#f0f0f0}
+.tr-metric .val.red{color:#ff4d4d}.tr-metric .val.green{color:#4ade80}
+.tr-metric .lbl{font-size:.55rem;letter-spacing:4px;text-transform:uppercase;color:rgba(240,240,240,.7);margin-top:4px;font-weight:400}
+
+.strat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+.strat-card{padding:28px;background:rgba(88,40,40,.1);border:1px solid rgba(88,40,40,.12);border-radius:0;transition:all .4s}
+.strat-card:hover{background:rgba(88,40,40,.18);border-color:rgba(88,40,40,.25);transform:translateY(-6px)}
+.strat-card .ver{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#ff4d4d;margin-bottom:6px}
+.strat-card .name{font-size:.9rem;font-weight:500;color:rgba(240,240,240,.75);margin-bottom:8px}
+.strat-card .desc{font-size:.75rem;color:rgba(240,240,240,.75);line-height:1.7;font-weight:400}
+.strat-card .ret{font-family:'JetBrains Mono',monospace;font-size:.9rem;color:#4ade80;margin-top:10px}
+
+/* ===== WRITING ===== */
+.section-writing{background:#160e0e}
+.writing-list{display:flex;flex-direction:column;gap:2px}
+.writing-item{position:relative;padding:36px 0 36px 24px;border-left:1px solid rgba(88,40,40,.15);margin-bottom:2px;display:grid;grid-template-columns:80px 1fr auto;gap:32px;align-items:center;transition:all .3s}
+.writing-item:hover{background:rgba(88,40,40,.06);border-left-color:rgba(88,40,40,.35)}
+.writing-item .num{font-family:'Playfair Display',serif;font-size:3rem;font-style:italic;color:rgba(88,40,40,.2);text-align:center}
+.writing-item .info .title{font-size:1.1rem;font-weight:500;color:rgba(240,240,240,.7);margin-bottom:4px}
+.writing-item .info .desc{font-size:.8rem;color:rgba(240,240,240,.7);line-height:1.6;font-weight:400}
+.writing-item .mets{display:flex;gap:20px;text-align:right}
+.writing-item .mets .m{font-family:'JetBrains Mono',monospace}
+.writing-item .mets .m .v{font-size:.95rem;color:rgba(240,240,240,.6);font-weight:400}
+.writing-item .mets .m .l{font-size:.55rem;letter-spacing:3px;text-transform:uppercase;color:rgba(240,240,240,.25);display:block}
+
+/* ===== HARDWARE ===== */
+.section-hardware{background:#141010}
+.hw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(88,40,40,.1)}
+.hw-item{padding:48px 36px;text-align:center;background:#1a1010;transition:all .4s;position:relative}
+.hw-item:hover{background:rgba(88,40,40,.08)}
+.hw-item .stage{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:4px;color:rgba(255,77,77,.3);margin-bottom:6px}
+.hw-item .icon-box{width:100%;height:120px;display:flex;align-items:center;justify-content:center;font-size:3.2rem;margin-bottom:16px;position:relative}
+.hw-item .icon-box::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(88,40,40,.15),transparent)}
+.hw-item .name{font-size:1rem;font-weight:500;color:rgba(240,240,240,.7);margin-bottom:6px}
+.hw-item .desc{font-size:.75rem;color:rgba(240,240,240,.75);line-height:1.7;font-weight:400}
+
+/* ===== DESIGN ===== */
+.section-design{background:#160e0e}
+.des-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(88,40,40,.1)}
+.des-item{padding:36px 24px;text-align:center;background:#1a1010;transition:all .3s}
+.des-item:hover{background:rgba(88,40,40,.06)}
+.des-item .ico{font-size:1.6rem;margin-bottom:8px}
+.des-item .name{font-size:.85rem;color:rgba(240,240,240,.6);font-weight:400}
+.des-item .yr{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:rgba(255,77,77,.2);margin-top:4px}
+
+/* ===== STATUS ===== */
+.section-status{background:#141010}
+.st-bar{display:flex;align-items:center;justify-content:space-between;padding:36px 48px;background:rgba(88,40,40,.08);border:1px solid rgba(88,40,40,.12);flex-wrap:wrap;gap:20px}
+.st-label{font-size:.5rem;letter-spacing:8px;text-transform:uppercase;color:rgba(255,77,77,.3);font-family:'JetBrains Mono',monospace}
+.st-items{display:flex;gap:36px;flex-wrap:wrap}
+.st-item{display:flex;align-items:center;gap:8px}
+.st-dot{width:6px;height:6px;border-radius:50%;animation:dPulse 2.5s ease-in-out infinite}
+.st-dot.red{background:#ff4d4d}.st-dot.green{background:#4ade80}.st-dot.gold{background:#b8952e}
+@keyframes dPulse{0%,100%{opacity:.15}50%{opacity:1}}
+.st-item .what{font-size:.85rem;color:rgba(240,240,240,.85);font-weight:400}
+.st-item .what .hlw{color:#ff4d4d;font-weight:500}
+
+/* ===== FOOTER ===== */
+footer{padding:48px;text-align:center;background:#100e0e}
+footer p{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:rgba(240,240,240,.4);letter-spacing:6px}
+
+/* ===== SVG chart tweaks ===== */
+.chart-svg line{stroke:rgba(255,255,255,.01)!important}
+.chart-svg text{fill:rgba(240,240,240,.2)!important}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  .tr-layout{grid-template-columns:1fr}
+  .hero-metrics{position:static;transform:none;flex-direction:row;flex-wrap:wrap;gap:16px;margin-top:40px;text-align:left}
+  .hero{padding:120px 24px 60px}
+  .hw-grid{grid-template-columns:1fr}
+  .des-grid{grid-template-columns:repeat(2,1fr)}
+  .strat-row{grid-template-columns:1fr}
+  .writing-item{grid-template-columns:1fr;gap:12px}
+  .writing-item .mets{justify-content:flex-start}
+}
+@media(max-width:600px){
+  .section{padding:100px 20px}
+  .hero{padding:100px 20px 60px}
+  .hero-metrics{flex-direction:column;gap:8px}
+  .hero h1{font-size:3rem}
+  .nav-links a:not(:first-child){display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">YyUHua</span>
+  <div class="nav-links">
+    <a href="#timeline">时间线</a>
+    <a href="#trading">量化</a>
+    <a href="#writing">写作</a>
+    <a href="#hardware">硬件</a>
+    <a href="#design">设计</a>
+    <a href="#status">状态</a>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-line"></div>
+  <div class="hero-name">杨昀桦</div>
+  <h1>持续<br>做事<span class="hl">.</span></h1>
+  <p>不只是作品集。是一份从2019年延伸到今天的行动记录。<br>七年，七个维度，每一个数字都是实际发生的事。</p>
+  <div class="hero-metrics">
+    <div class="hero-metric"><div class="num">7<span class="r_hl">年</span></div><div class="lbl">持续输出</div></div>
+    <div class="hero-metric"><div class="num">100<span class="r_hl">+</span></div><div class="lbl">品牌项目</div></div>
+    <div class="hero-metric"><div class="num">3</div><div class="lbl">长篇小说</div></div>
+    <div class="hero-metric"><div class="num">7</div><div class="lbl">策略迭代</div></div>
+  </div>
+  <div class="hero-scroll">↓ 向下滚动</div>
+</section>
+
+<!-- ===== TIMELINE ===== -->
+<section class="section section-timeline" id="timeline">
+  <div class="section-inner">
+    <div class="r"><p class="section-label">/ 01</p><div class="section-top-deco"></div></div>
+    <div class="r d1"><p style="font-size:clamp(1.4rem,2.8vw,2rem);font-weight:300;color:rgba(240,240,240,.6);margin-bottom:56px;letter-spacing:-.01em">从第一个项目到今天<br><span style="color:rgba(255,77,77,.35)">七年，一个没停过的人。</span></p></div>
+    <div class="tl-wrap r d2">
+      <div class="tl-line"></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2019</div><div class="tl-title">成都大运会 <span class="hl">·</span> 视觉设计</div><div class="tl-sub">第一个国家级项目</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2020</div><div class="tl-title">金沙遗址博物馆 <span class="hl">·</span> 视觉设计</div><div class="tl-sub">文化遗产跨界</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2021</div><div class="tl-title">世界科幻大会 <span class="hl">·</span> 视觉设计</div><div class="tl-sub">视野拓展至未来</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2022</div><div class="tl-title">第一部长篇小说完成 <span class="hl">·</span> 35万字</div><div class="tl-sub">写作生涯开篇</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2023</div><div class="tl-title">天府机场二十大</div><div class="tl-sub">政务设计 + 38万字并行</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2024</div><div class="tl-title">V7 量化策略上线 <span class="hl">·</span> 实盘运行</div><div class="tl-sub">缠论二买二卖 + 四级结构</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2025</div><div class="tl-title">V7PRO + 第三部 + 安月总线</div><div class="tl-sub">量化迭代·写作突破百万·多Agent</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2026</div><div class="tl-title">V9 · DeepThink · 三Agent生态</div><div class="tl-sub">安月架构成型，仍在迭代</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TRADING ===== -->
+<section class="section tr-section" id="trading">
+  <div class="section-inner">
+    <div class="r"><p class="section-label">/ 02 量化交易</p><div class="section-top-deco"></div></div>
+    <div class="r d1"><p style="font-size:clamp(1.4rem,2.8vw,2rem);font-weight:300;color:rgba(240,240,240,.6);margin-bottom:56px">模拟收益曲线 · 核心指标 · <span style="color:rgba(255,77,77,.35)">三个版本的进化</span></p></div>
+    <div class="tr-layout">
+      <div class="chart-area r d2">
+        <div class="tag">📈 权益曲线 (V7 → V9)</div>
+        <svg class="chart-svg" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid meet">
+          <line x1="40" y1="40" x2="580" y2="40" stroke="rgba(255,255,255,.008)" stroke-width="1"/>
+          <line x1="40" y1="100" x2="580" y2="100" stroke="rgba(255,255,255,.008)" stroke-width="1"/>
+          <line x1="40" y1="160" x2="580" y2="160" stroke="rgba(255,255,255,.008)" stroke-width="1"/>
+          <line x1="40" y1="220" x2="580" y2="220" stroke="rgba(255,255,255,.008)" stroke-width="1"/>
+          <defs>
+            <linearGradient id="eqFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(255,77,77,.12)"/>
+              <stop offset="100%" stop-color="rgba(255,77,77,0)"/>
+            </linearGradient>
+          </defs>
+          <path d="M40,208 L52,204 L80,200 L108,194 L136,186 L164,177 L192,162 L220,148 L248,136 L276,124 L304,108 L332,88 L360,68 L388,52 L416,44 L444,36 L472,32 L500,26 L528,20 L556,14 L580,10 L580,240 L40,240 Z" fill="url(#eqFill)" opacity=".7"/>
+          <path d="M40,208 L52,204 L80,200 L108,194 L136,186 L164,177 L192,162 L220,148 L248,136 L276,124 L304,108 L332,88 L360,68 L388,52 L416,44 L444,36 L472,32 L500,26 L528,20 L556,14 L580,10" fill="none" stroke="#ff4d4d" stroke-width="1.8" opacity=".9"/>
+          <circle cx="40" cy="208" r="2" fill="#ff4d4d" opacity=".5"/>
+          <circle cx="580" cy="10" r="3" fill="#ff4d4d" opacity=".8"/>
+          <path d="M248,136 L276,142 L304,148 L332,144" fill="none" stroke="rgba(255,77,77,.3)" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="40" y="234" font-family="JetBrains Mono,monospace" font-size="5" fill="rgba(240,240,240,.25)">2024/01</text>
+          <text x="290" y="234" font-family="JetBrains Mono,monospace" font-size="5" fill="rgba(240,240,240,.25)" text-anchor="middle">2025</text>
+          <text x="560" y="234" font-family="JetBrains Mono,monospace" font-size="5" fill="rgba(240,240,240,.25)" text-anchor="end">2026/05</text>
+          <text x="38" y="44" font-family="JetBrains Mono,monospace" font-size="5" fill="rgba(240,240,240,.25)" text-anchor="end">+300%</text>
+          <text x="38" y="104" font-family="JetBrains Mono,monospace" font-size="5" fill="rgba(240,240,240,.25)" text-anchor="end">+100%</text>
+          <text x="38" y="218" font-family="JetBrains Mono,monospace" font-size="5" fill="rgba(240,240,240,.25)" text-anchor="end">0%</text>
+          <text x="580" y="6" font-family="JetBrains Mono,monospace" font-size="6" fill="#ff4d4d" text-anchor="end" opacity=".9">+287.3%</text>
+        </svg>
+      </div>
+      <div class="tr-metrics r d3">
+        <div class="tr-metric"><div class="val green">+187.3<small style="font-size:.35em;color:rgba(240,240,240,.3)">%</small></div><div class="lbl">累计收益率</div></div>
+        <div class="tr-metric"><div class="val">72.4<small style="font-size:.35em;color:rgba(240,240,240,.3)">%</small></div><div class="lbl">胜率</div></div>
+        <div class="tr-metric"><div class="val red">-8.6<small style="font-size:.35em;color:rgba(240,240,240,.3)">%</small></div><div class="lbl">最大回撤</div></div>
+        <div class="tr-metric"><div class="val">1.89</div><div class="lbl">夏普比率</div></div>
+        <div class="tr-metric"><div class="val">1,247</div><div class="lbl">总交易次数</div></div>
+        <div class="tr-metric"><div class="val">2.4<small style="font-size:.35em;color:rgba(240,240,240,.3)">:1</small></div><div class="lbl">盈亏比</div></div>
+      </div>
+    </div>
+    <div class="strat-row r d4">
+      <div class="strat-card"><div class="ver">V7</div><div class="name">缠论二买二卖</div><div class="desc">基础结构 + 春夏秋冬四季出场</div><div class="ret">首发</div></div>
+      <div class="strat-card"><div class="ver">V7PRO</div><div class="name">一类买卖点 + 双策略</div><div class="desc">缠论引擎集成，双策略并行</div><div class="ret">+42%</div></div>
+      <div class="strat-card"><div class="ver">V9</div><div class="name">移动止损·多级别联立</div><div class="desc">G1等比止盈 + 多周期共振过滤</div><div class="ret">-62% 回撤</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WRITING ===== -->
+<section class="section section-writing" id="writing">
+  <div class="section-inner">
+    <div class="r"><p class="section-label">/ 03 写作</p><div class="section-top-deco"></div></div>
+    <div class="r d1"><p style="font-size:clamp(1.4rem,2.8vw,2rem);font-weight:300;color:rgba(240,240,240,.6);margin-bottom:56px">百万字之后 <span style="color:rgba(255,77,77,.35)">仍在写</span></p></div>
+    <div class="writing-list r d2">
+      <div class="writing-item">
+        <div class="num">01</div>
+        <div class="info">
+          <div class="title">《因》</div>
+          <div class="desc">第一部长篇小说，35万字</div>
+        </div>
+        <div class="mets">
+          <div class="m"><span class="v">2022</span><span class="l">完成</span></div>
+        </div>
+      </div>
+      <div class="writing-item">
+        <div class="num">02</div>
+        <div class="info">
+          <div class="title">《萧木》</div>
+          <div class="desc">第二部长篇小说，38万字</div>
+        </div>
+        <div class="mets">
+          <div class="m"><span class="v">2023-24</span><span class="l">创作期</span></div>
+        </div>
+      </div>
+      <div class="writing-item">
+        <div class="num">03</div>
+        <div class="info">
+          <div class="title">《桉》</div>
+          <div class="desc">第三部长篇小说，已发布微信读书</div>
+        </div>
+        <div class="mets">
+          <div class="m"><span class="v">2025</span><span class="l">发布</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HARDWARE ===== -->
+<section class="section section-hardware" id="hardware">
+  <div class="section-inner">
+    <div class="r"><p class="section-label">/ 04 硬件</p><div class="section-top-deco"></div></div>
+    <div class="r d1"><p style="font-size:clamp(1.4rem,2.8vw,2rem);font-weight:300;color:rgba(240,240,240,.6);margin-bottom:56px">从辉光管到自动化 <span style="color:rgba(255,77,77,.35)">硬核落地</span></p></div>
+    <div class="hw-grid r d2">
+      <div class="hw-item">
+        <div class="stage">产品</div>
+        <div class="icon-box">🕯️</div>
+        <div class="name">辉光管时钟</div>
+        <div class="desc">硬件设计 · 自动化测试框架</div>
+      </div>
+      <div class="hw-item">
+        <div class="stage">品牌</div>
+        <div class="icon-box">△</div>
+        <div class="name">图阿凸</div>
+        <div class="desc">周易文创品牌 · 产品设计</div>
+      </div>
+      <div class="hw-item">
+        <div class="stage">设施</div>
+        <div class="icon-box">⚙️</div>
+        <div class="name">自动化测试框架</div>
+        <div class="desc">辉光管产线质检自动化</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DESIGN ===== -->
+<section class="section section-design" id="design">
+  <div class="section-inner">
+    <div class="r"><p class="section-label">/ 05 设计</p><div class="section-top-deco"></div></div>
+    <div class="r d1"><p style="font-size:clamp(1.4rem,2.8vw,2rem);font-weight:300;color:rgba(240,240,240,.6);margin-bottom:56px">四个世界级 IP <span style="color:rgba(255,77,77,.35)">的视觉注脚</span></p></div>
+    <div class="des-grid r d2">
+      <div class="des-item"><div class="ico">🏛️</div><div class="name">成都大运会</div><div class="yr">2019</div></div>
+      <div class="des-item"><div class="ico">🏺</div><div class="name">金沙博物馆</div><div class="yr">2020</div></div>
+      <div class="des-item"><div class="ico">🌌</div><div class="name">世界科幻大会</div><div class="yr">2021</div></div>
+      <div class="des-item"><div class="ico">✈️</div><div class="name">天府机场二十大</div><div class="yr">2023</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATUS ===== -->
+<section class="section section-status" id="status">
+  <div class="section-inner">
+    <div class="r"><p class="section-label">/ 06 当前状态</p><div class="section-top-deco"></div></div>
+    <div class="r d1"><p style="font-size:clamp(1.4rem,2.8vw,2rem);font-weight:300;color:rgba(240,240,240,.6);margin-bottom:56px">此刻在做什么？<br><span style="color:rgba(255,77,77,.35)">动态更新·持续做事。</span></p></div>
+    <div class="st-bar r d2">
+      <div class="st-label">● 正在</div>
+      <div class="st-items">
+        <div class="st-item"><div class="st-dot red"></div><span class="what"><span class="hlw">开发</span> V10 策略迭代 · 自适应风控</span></div>
+        <div class="st-item"><div class="st-dot green"></div><span class="what"><span class="hlw">阅读</span> 陀思妥耶夫斯基 · 卡拉马佐夫兄弟</span></div>
+        <div class="st-item"><div class="st-dot gold"></div><span class="what"><span class="hlw">学习</span> Rust · 重构量化引擎核心</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer><p>杨昀桦 · YyUHua · 2026</p></footer>
+
+<script>
+document.querySelectorAll('.r').forEach(el => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('v') });
+  }, { threshold: .1, rootMargin: '0px 0px -60px 0px' }).observe(el);
+});
+
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const heroH1 = document.querySelector('.hero h1');
+let scrambleInterval;
+
+function scrambleEffect() {
+  let runs = 0;
+  scrambleInterval = setInterval(() => {
+    const text = '持续做事.';
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+      if (i < runs) result += text[i];
+      else result += chars[Math.floor(Math.random() * chars.length)];
+    }
+    heroH1.innerHTML = result.replace('.', '<span class="hl">.</span>');
+    if (runs >= text.length) clearInterval(scrambleInterval);
+    runs++;
+  }, 60);
+}
+setTimeout(scrambleEffect, 400);
+
+console.log('✦ 杨昀桦 · 持续做事 ✦');
+console.log('没有形容词，只有数字和行动。');
+</script>
+</body>
+</html>

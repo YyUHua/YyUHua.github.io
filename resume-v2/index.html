@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YyUHua · 我与世纪共百年</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  background:#f5f2ed;
+  color:#1a1a1a;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(184,149,46,.18);color:#7a621f}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(184,149,46,.15);border-radius:4px}
+
+/* ===== 3D CANVAS ===== */
+#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.3}
+
+/* ===== SECTION BASE ===== */
+.section{position:relative;z-index:2;padding:120px 40px}
+.section-inner{max-width:1100px;margin:0 auto}
+
+/* ===== SECTION LABELS ===== */
+.section-number{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:rgba(184,149,46,.5);letter-spacing:4px;margin-bottom:4px;font-weight:400}
+.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.8rem);
+  font-weight:700;
+  letter-spacing:-.02em;
+  line-height:1.15;
+  margin-bottom:48px;
+  color:#1a1a1a;
+}
+.section-title .gold{color:#b8952e}
+.section-title .light{font-weight:400;color:#8b8b8b}
+
+/* ===== DIVIDER ===== */
+.divider{width:40px;height:2px;background:#b8952e;margin-bottom:40px}
+
+/* ===== REVEAL ===== */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.23,1,.32,1),transform .8s cubic-bezier(.23,1,.32,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.delay-1{transition-delay:.12s}
+.delay-2{transition-delay:.24s}
+.delay-3{transition-delay:.36s}
+.delay-4{transition-delay:.48s}
+.delay-5{transition-delay:.6s}
+
+/* ===== HERO ===== */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;position:relative}
+.hero-inner{position:relative;z-index:3}
+
+.hero-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.6rem;
+  letter-spacing:6px;
+  color:#b8952e;
+  margin-bottom:20px;
+  font-weight:400;
+  opacity:0;
+  animation:heroFade 1s .2s forwards;
+}
+
+.hero-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,15vw,10rem);
+  font-weight:900;
+  letter-spacing:-.06em;
+  line-height:1;
+  color:#1a1a1a;
+  opacity:0;
+  animation:heroFade 1s .4s forwards;
+}
+
+.hero-sub{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(.7rem,1.6vw,1.1rem);
+  font-weight:400;
+  font-style:italic;
+  color:#b8952e;
+  letter-spacing:10px;
+  margin-top:2px;
+  opacity:0;
+  animation:heroFade 1s .6s forwards;
+}
+
+.hero-signature{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.2rem,3vw,2.4rem);
+  font-weight:400;
+  font-style:italic;
+  color:rgba(26,26,26,.06);
+  margin:24px 0;
+  min-height:1.3em;
+  letter-spacing:4px;
+  opacity:0;
+  animation:heroFade 1s .8s forwards;
+}
+#typewriter{display:inline-block}
+#typewriter::after{content:'|';animation:curBlink 1s step-end infinite;color:rgba(184,149,46,.2);font-weight:100}
+@keyframes curBlink{50%{opacity:0}}
+
+.hero-tags{
+  display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
+  opacity:0;animation:heroFade 1s 1s forwards;
+}
+.hero-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.55rem;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:rgba(26,26,26,.15);
+  position:relative;
+}
+.hero-tag::after{content:'·';position:absolute;right:-10px;color:rgba(184,149,46,.2)}
+.hero-tag:last-child::after{display:none}
+
+.hero-actions{
+  display:flex;gap:12px;justify-content:center;margin-top:36px;flex-wrap:wrap;
+  opacity:0;animation:heroFade 1s 1.2s forwards;
+}
+.btn-outline{
+  padding:10px 32px;
+  border:1px solid rgba(26,26,26,.1);
+  border-radius:100px;
+  font-size:.7rem;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:rgba(26,26,26,.4);
+  cursor:pointer;
+  transition:all .4s;
+  text-decoration:none;
+  font-family:'Inter',sans-serif;
+  background:transparent;
+}
+.btn-outline:hover{
+  border-color:#b8952e;
+  color:#b8952e;
+  transform:translateY(-2px);
+}
+.btn-filled{
+  background:#1a1a1a;
+  border-color:#1a1a1a;
+  color:#f5f2ed;
+}
+.btn-filled:hover{
+  background:#b8952e;
+  border-color:#b8952e;
+  color:#fff;
+}
+
+.hero-scroll{
+  position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  opacity:0;animation:heroFade 1s 1.6s forwards;
+}
+.hero-scroll span{font-size:.45rem;letter-spacing:6px;color:rgba(26,26,26,.07);font-family:'JetBrains Mono',monospace}
+.hero-scroll-line{width:20px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,149,46,.15),transparent);animation:scrollLine 2.5s ease-in-out infinite}
+@keyframes scrollLine{0%,100%{opacity:.1;transform:scaleX(.3)}50%{opacity:.6;transform:scaleX(1)}}
+
+@keyframes heroFade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== ABOUT ===== */
+.about-wrapper{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+.about-text p{font-size:.92rem;line-height:1.9;color:rgba(26,26,26,.6);font-weight:300;margin-bottom:16px}
+.about-text p:last-child{margin-bottom:0}
+.about-info{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.info-item{padding:14px 0;border-bottom:1px solid rgba(26,26,26,.04)}
+.info-item .lbl{font-size:.55rem;letter-spacing:4px;text-transform:uppercase;color:rgba(26,26,26,.15);margin-bottom:2px;font-family:'JetBrains Mono',monospace}
+.info-item .val{font-size:.85rem;color:rgba(26,26,26,.55);font-weight:300}
+.about-tags{margin-top:12px;display:flex;flex-wrap:wrap;gap:4px}
+.about-tag{
+  padding:3px 12px;
+  font-size:.65rem;
+  color:rgba(26,26,26,.35);
+  background:rgba(184,149,46,.04);
+  border:1px solid rgba(184,149,46,.08);
+  border-radius:100px;
+  transition:all .3s;
+  cursor:default;
+}
+.about-tag:hover{color:rgba(184,149,46,.55);background:rgba(184,149,46,.06);border-color:rgba(184,149,46,.12);transform:translateY(-1px)}
+
+/* ===== STATS ===== */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.stat-item{text-align:center;padding:32px 12px;border-right:1px solid rgba(26,26,26,.04)}
+.stat-item:last-child{border-right:none}
+.stat-num{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.2rem,5vw,4rem);
+  font-weight:700;
+  color:#1a1a1a;
+  line-height:1;
+  margin-bottom:4px;
+}
+.stat-num .plus{color:#b8952e;font-weight:400;font-size:.5em;vertical-align:super}
+.stat-lbl{font-size:.55rem;letter-spacing:4px;color:rgba(26,26,26,.12);text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+@media(max-width:768px){
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:0}
+  .stat-item{border-right:none;border-bottom:1px solid rgba(26,26,26,.04);padding:24px 12px}
+}
+
+/* ===== EXPERIENCE ===== */
+.exp-two-col{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.exp-col-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:600;color:#1a1a1a;margin-bottom:20px}
+.exp-list{display:flex;flex-direction:column;gap:0}
+.exp-entry{position:relative;padding:16px 0 16px 24px;border-left:1px solid rgba(184,149,46,.1)}
+.exp-entry::before{content:'';position:absolute;left:-3px;top:20px;width:5px;height:5px;border-radius:50%;background:#b8952e;opacity:.3}
+.exp-entry:hover::before{opacity:.8}
+.exp-entry .title{font-size:.82rem;font-weight:500;color:rgba(26,26,26,.7);margin-bottom:2px}
+.exp-entry .sub{font-size:.72rem;color:rgba(26,26,26,.3);font-weight:300}
+.exp-entry .year{position:absolute;right:0;top:16px;font-size:.55rem;font-family:'JetBrains Mono',monospace;color:rgba(184,149,46,.2)}
+.exp-meta{display:flex;gap:8px;margin-top:20px;padding:16px 20px;background:rgba(184,149,46,.02);border:1px solid rgba(184,149,46,.06);border-radius:8px}
+.exp-meta span{font-size:.75rem;color:rgba(26,26,26,.35);font-weight:300}
+
+/* ===== PROJECTS ===== */
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.proj-card{
+  padding:28px;
+  background:#fff;
+  border:1px solid rgba(26,26,26,.04);
+  border-radius:12px;
+  transition:all .4s;
+  cursor:default;
+}
+.proj-card:hover{box-shadow:0 8px 40px rgba(26,26,26,.03);transform:translateY(-4px);border-color:rgba(184,149,46,.08)}
+.proj-icon{font-size:1.2rem;margin-bottom:8px}
+.proj-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.proj-desc{font-size:.72rem;color:rgba(26,26,26,.35);line-height:1.7;font-weight:300}
+.proj-desc .hl{color:#b8952e}
+@media(max-width:768px){.proj-grid{grid-template-columns:1fr}}
+
+/* ===== SKILLS ===== */
+.skills-wrapper{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+.skill-group{}
+.skill-group-title{font-size:.65rem;letter-spacing:4px;text-transform:uppercase;color:rgba(26,26,26,.15);margin-bottom:12px;font-family:'JetBrains Mono',monospace}
+.skill-tags{display:flex;flex-wrap:wrap;gap:4px}
+.skill-tag{padding:4px 12px;font-size:.7rem;color:rgba(26,26,26,.35);background:rgba(26,26,26,.02);border:1px solid rgba(26,26,26,.04);border-radius:6px;transition:all .3s;cursor:default}
+.skill-tag:hover{color:#b8952e;background:rgba(184,149,46,.03);border-color:rgba(184,149,46,.08);transform:translateY(-2px)}
+@media(max-width:768px){.skills-wrapper{grid-template-columns:1fr}}
+
+/* ===== INTERESTS ===== */
+.interests-row{display:flex;gap:4px;flex-wrap:wrap}
+.interest-pill{
+  padding:6px 18px;
+  background:rgba(184,149,46,.03);
+  border:1px solid rgba(184,149,46,.06);
+  border-radius:100px;
+  font-size:.75rem;
+  color:rgba(26,26,26,.3);
+  transition:all .3s;
+  cursor:default;
+}
+.interest-pill:hover{color:#b8952e;background:rgba(184,149,46,.06);border-color:rgba(184,149,46,.12);transform:translateY(-2px)}
+
+/* ===== FOOTER ===== */
+.footer{text-align:center;padding:80px 40px 40px;position:relative;z-index:2}
+.footer-line{width:40px;height:1px;background:rgba(184,149,46,.1);margin:0 auto 16px}
+.footer-text{font-family:'Playfair Display',serif;font-size:.8rem;font-style:italic;color:rgba(26,26,26,.08);letter-spacing:4px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .section{padding:80px 20px}
+  .about-wrapper{grid-template-columns:1fr;gap:32px}
+  .exp-two-col{grid-template-columns:1fr;gap:40px}
+  .about-info{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-inner">
+    <p class="hero-label">✦ 你好，世界</p>
+    <h1 class="hero-name">YyUHua</h1>
+    <p class="hero-sub">— 杨昀桦 —</p>
+    <div class="hero-signature"><span id="typewriter"></span></div>
+    <div class="hero-tags">
+      <span class="hero-tag">Designer</span>
+      <span class="hero-tag">Engineer</span>
+      <span class="hero-tag">Writer</span>
+      <span class="hero-tag">Quant</span>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-outline btn-filled" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">探索</button>
+      <a class="btn-outline" href="mailto:18349862535@163.com">联系</a>
+    </div>
+  </div>
+  <div class="hero-scroll"><span>Scroll</span><div class="hero-scroll-line"></div></div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section class="section" id="about">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-number">/ 01</p></div>
+    <div class="reveal delay-1"><h2 class="section-title">在世纪的刻度上<br><span class="gold">行走</span></h2></div>
+    <div class="about-wrapper">
+      <div class="about-text reveal delay-2">
+        <p>一个以纸笔开始、以代码延伸的创作者。四川大学硕士在读，INFP 的天赋让她的触角同时伸向文学、设计与工程。</p>
+        <p>写过长篇小说三部，做过百场品牌全案，搭过实盘量化交易系统，管着三个 AI Agent。</p>
+      </div>
+      <div class="reveal delay-3">
+        <div class="about-info">
+          <div class="info-item"><div class="lbl">年龄</div><div class="val">25岁</div></div>
+          <div class="info-item"><div class="lbl">人格</div><div class="val">INFP · 双鱼</div></div>
+          <div class="info-item"><div class="lbl">学历</div><div class="val">四川大学 硕士</div></div>
+          <div class="info-item"><div class="lbl">坐标</div><div class="val">四川 · 成都</div></div>
+        </div>
+        <div class="about-tags">
+          <span class="about-tag">☕ 咖啡</span>
+          <span class="about-tag">✏️ 设计</span>
+          <span class="about-tag">📖 文学</span>
+          <span class="about-tag">🎵 陈奕迅</span>
+          <span class="about-tag">📚 陀思妥耶夫斯基</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section class="section" id="stats">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-number">/ 02</p></div>
+    <div class="reveal delay-1"><h2 class="section-title">一些<span class="gold">数字</span><span class="light">，</span>一些<span class="gold">证据</span></h2></div>
+    <div class="stats-row reveal delay-2">
+      <div class="stat-item"><div class="stat-num"><span data-target="100">0</span><span class="plus">+</span></div><div class="stat-lbl">品牌营销案例</div></div>
+      <div class="stat-item"><div class="stat-num"><span data-target="7">0</span></div><div class="stat-lbl">量化策略迭代</div></div>
+      <div class="stat-item"><div class="stat-num"><span data-target="3">0</span></div><div class="stat-lbl">AI Agents</div></div>
+      <div class="stat-item"><div class="stat-num"><span data-target="1">0</span></div><div class="stat-lbl">人生 · 无限可能</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EXPERIENCE ===== -->
+<section class="section" id="experience">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-number">/ 03</p></div>
+    <div class="reveal delay-1"><h2 class="section-title">用作品<span class="gold">说话</span></h2></div>
+    <div class="exp-two-col">
+      <div class="reveal delay-2">
+        <p class="exp-col-title">🎨 视觉设计</p>
+        <div class="exp-list">
+          <div class="exp-entry"><div class="title">成都第31届世界大学生夏季运动会</div><div class="sub">视觉设计</div></div>
+          <div class="exp-entry"><div class="title">成都世界科幻大会</div><div class="sub">视觉设计</div></div>
+          <div class="exp-entry"><div class="title">成都金沙遗址博物馆</div><div class="sub">视觉设计</div></div>
+          <div class="exp-entry"><div class="title">成都天府国际机场二十大主题展</div><div class="sub">视觉设计</div></div>
+        </div>
+      </div>
+      <div class="reveal delay-3">
+        <p class="exp-col-title">📊 营销策划</p>
+        <div class="exp-list">
+          <div class="exp-entry"><div class="title">品牌营销全案</div><div class="sub">覆盖文旅、文创、消费电子等领域，超百场</div></div>
+        </div>
+        <div class="exp-meta"><span>从策略到执行的全案能力 · 百场实战经验</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== AI & QUANT ===== -->
+<section class="section" id="engineering">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-number">/ 04</p></div>
+    <div class="reveal delay-1"><h2 class="section-title">把复杂<br><span class="gold">变成优雅</span></h2></div>
+    <div class="proj-grid">
+      <div class="proj-card reveal delay-2"><div class="proj-icon">📊</div><div class="proj-name">全自动量化交易系统</div><div class="proj-desc">缠论二买二卖 + 四级结构，V7 → V7PRO → V9 迭代，引入移动止损、多级别联立、等比止盈，<span class="hl">实盘运行中</span></div></div>
+      <div class="proj-card reveal delay-3"><div class="proj-icon">🧠</div><div class="proj-name">多智能体协作架构</div><div class="proj-desc">安月总线 — 多 AI Agent 通信编排系统，管理 <span class="hl">疏月·知禾·夏嫣</span> 三 Agent 分工协作</div></div>
+      <div class="proj-card reveal delay-4"><div class="proj-icon">🔗</div><div class="proj-name">双平台 Agent 生态</div><div class="proj-desc">Hermes Agent + OpenClaw 双平台 · 微信直连 Claude Code（cc-connect）· 长期记忆系统（PLUR）</div></div>
+      <div class="proj-card reveal delay-5"><div class="proj-icon">⚡</div><div class="proj-name">Deep-Think 架构</div><div class="proj-desc">自研混合工作流 — Pro 深度分析 + Flash 快速执行，跨模型协同，<span class="hl">降本增效</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SKILLS ===== -->
+<section class="section" id="skills">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-number">/ 05</p></div>
+    <div class="reveal delay-1"><h2 class="section-title">工具是<span class="gold">思想的延伸</span></h2></div>
+    <div class="skills-wrapper reveal delay-2">
+      <div class="skill-group">
+        <p class="skill-group-title">🤖 AI 模型</p>
+        <div class="skill-tags">
+          <span class="skill-tag">Claude</span><span class="skill-tag">DeepSeek</span><span class="skill-tag">GPT-5.5</span>
+          <span class="skill-tag">火山引擎</span><span class="skill-tag">硅基流动</span><span class="skill-tag">Qwen</span>
+        </div>
+        </div>
+      <div class="skill-group">
+        <p class="skill-group-title">💻 开发</p>
+        <div class="skill-tags">
+          <span class="skill-tag">Python</span><span class="skill-tag">API 集成</span><span class="skill-tag">Linux</span>
+          <span class="skill-tag">Docker</span><span class="skill-tag">Git</span><span class="skill-tag">CI/CD</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <p class="skill-group-title">🎯 综合</p>
+        <div class="skill-tags">
+          <span class="skill-tag">品牌视觉设计</span><span class="skill-tag">营销全案策划</span>
+          <span class="skill-tag">量化交易</span><span class="skill-tag">AI 工程</span>
+          <span class="skill-tag">多智能体系统</span><span class="skill-tag">文学创作</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== INTERESTS ===== -->
+<section class="section" id="interests">
+  <div class="section-inner">
+    <div class="reveal"><p class="section-number">/ 06</p></div>
+    <div class="reveal delay-1"><h2 class="section-title">除了代码<br><span class="gold">还有生活</span></h2></div>
+    <div class="interests-row reveal delay-2">
+      <span class="interest-pill">☕ 咖啡成瘾</span>
+      <span class="interest-pill">✏️ 设计</span>
+      <span class="interest-pill">📖 小说三本 · 百万字</span>
+      <span class="interest-pill">🎵 陈奕迅</span>
+      <span class="interest-pill">📚 陀思妥耶夫斯基</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-line"></div>
+  <p class="footer-text">YyUHua · 我与世纪共百年 · 2026</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ===== THREE.JS — Minimal Golden Rings =====
+const canvas = document.getElementById('bg');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+const goldColor = '#b8952e';
+
+// ---- Ring 1: Main ----
+const r1Geo = new THREE.TorusGeometry(1.6, 0.012, 32, 80);
+const r1Mat = new THREE.MeshBasicMaterial({ color: goldColor, transparent: true, opacity: 0.08 });
+const ring1 = new THREE.Mesh(r1Geo, r1Mat);
+ring1.position.set(0, 0.3, -2);
+ring1.rotation.x = Math.PI / 3;
+scene.add(ring1);
+
+// ---- Ring 2: Perpendicular ----
+const r2Geo = new THREE.TorusGeometry(1.9, 0.008, 32, 80);
+const r2Mat = new THREE.MeshBasicMaterial({ color: goldColor, transparent: true, opacity: 0.05 });
+const ring2 = new THREE.Mesh(r2Geo, r2Mat);
+ring2.position.set(0, -0.1, -2);
+ring2.rotation.y = Math.PI / 4;
+ring2.rotation.x = Math.PI / 2.5;
+scene.add(ring2);
+
+// ---- Ring 3: Small inner ----
+const r3Geo = new THREE.TorusGeometry(1.2, 0.006, 24, 60);
+const r3Mat = new THREE.MeshBasicMaterial({ color: goldColor, transparent: true, opacity: 0.06 });
+const ring3 = new THREE.Mesh(r3Geo, r3Mat);
+ring3.position.set(0, 0.2, -1);
+ring3.rotation.x = Math.PI / 1.8;
+ring3.rotation.z = Math.PI / 3;
+scene.add(ring3);
+
+// ---- Subtle dots around ring path ----
+const dotCount = 80;
+const dotGeo = new THREE.BufferGeometry();
+const dotPos = new Float32Array(dotCount * 3);
+for (let i = 0; i < dotCount; i++) {
+  const theta = (i / dotCount) * Math.PI * 2;
+  const r = 1.6;
+  dotPos[i*3] = r * Math.cos(theta);
+  dotPos[i*3+1] = r * Math.sin(theta) * 0.5 + 0.3;
+  dotPos[i*3+2] = -2;
+}
+dotGeo.setAttribute('position', new THREE.BufferAttribute(dotPos, 3));
+const dotMat = new THREE.PointsMaterial({ size: 0.015, color: goldColor, transparent: true, opacity: 0.04, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+const dots = new THREE.Points(dotGeo, dotMat);
+scene.add(dots);
+
+// ---- Extra scattered dust ----
+const dustCount = 200;
+const dustGeo = new THREE.BufferGeometry();
+const dustPos = new Float32Array(dustCount * 3);
+for (let i = 0; i < dustCount; i++) {
+  dustPos[i*3] = (Math.random() - 0.5) * 8;
+  dustPos[i*3+1] = (Math.random() - 0.5) * 8;
+  dustPos[i*3+2] = -1 - Math.random() * 4;
+}
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+const dustMat = new THREE.PointsMaterial({ size: 0.005, color: goldColor, transparent: true, opacity: 0.02, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+const dust = new THREE.Points(dustGeo, dustMat);
+scene.add(dust);
+
+camera.position.z = 5;
+
+// ---- Mouse ----
+let mx = 0, my = 0;
+let scrolled = 0;
+document.addEventListener('mousemove', e => {
+  mx = (e.clientX / window.innerWidth - 0.5) * 0.5;
+  my = (e.clientY / window.innerHeight - 0.5) * 0.5;
+});
+window.addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  scrolled = window.scrollY / max;
+}, { passive: true });
+
+// ---- Animate ----
+function animate() {
+  requestAnimationFrame(animate);
+
+  // Smooth mouse
+  ring1.rotation.y += 0.001 + mx * 0.002;
+  ring1.rotation.x = Math.PI / 3 + my * 0.2;
+
+  ring2.rotation.y += 0.002 + mx * 0.001;
+  ring2.rotation.x = Math.PI / 2.5 + my * 0.15;
+
+  ring3.rotation.z += 0.003 + mx * 0.001;
+  ring3.rotation.x += my * 0.001;
+
+  // Dots orbit
+  dots.rotation.y += 0.001;
+  dots.rotation.x = my * 0.1;
+
+  // Dust slow drift
+  dust.rotation.y += 0.0003;
+
+  // Scroll effect: rings slightly tilt
+  const scrollRotate = scrolled * 0.15;
+  ring1.rotation.z += scrollRotate * 0.0005;
+  ring2.rotation.y += scrollRotate * 0.0003;
+
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ===== TYPEWRITER =====
+const text = '我 与 世 纪 共 百 年';
+const tw = document.getElementById('typewriter');
+let i = 0;
+function type() {
+  if (i < text.length) {
+    tw.textContent += text[i];
+    i++;
+    setTimeout(type, 70 + Math.random() * 40);
+  }
+}
+setTimeout(type, 2000);
+
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== COUNTERS =====
+new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting || e.target.classList.contains('done')) return;
+    e.target.classList.add('done');
+    const target = parseInt(e.target.dataset.target);
+    if (isNaN(target)) return;
+    const dur = 2000, start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / dur, 1);
+      e.target.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}, { threshold: 0.5 }).observe(document.querySelector('[data-target]'));
+// Need to observe each
+document.querySelectorAll('[data-target]').forEach(el => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting || e.target.classList.contains('done')) return;
+      e.target.classList.add('done');
+      const target = parseInt(e.target.dataset.target);
+      if (isNaN(target)) return;
+      const dur = 2000, start = performance.now();
+      function tick(now) {
+        const p = Math.min((now - start) / dur, 1);
+        e.target.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target);
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  }, { threshold: 0.5 }).observe(el);
+});
+
+console.log('✦ YyUHua · Editorial Luxury Edition ✦');
+console.log('Built by 夏嫣 · third time\'s the charm');
+</script>
+</body>
+</html>

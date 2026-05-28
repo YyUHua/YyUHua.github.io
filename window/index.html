@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>窗外 · Window</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{height:100%}
+body{height:100%;background:#0a0806;display:flex;align-items:center;justify-content:center;font-family:'Inter','PingFang SC',-apple-system,'Microsoft YaHei',sans-serif;overflow:hidden;user-select:none}
+
+/* ── Scene ── */
+.scene{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 50%,#1a1410,#0a0806)}
+
+/* ── Wallpaper behind window ── */
+.scene::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,.003) 40px,rgba(255,255,255,.003) 41px);pointer-events:none}
+
+/* ── Window Container ── */
+.window-wrapper{position:relative;width:min(90vw,1000px);height:min(80vh,700px);z-index:1}
+
+/* ── Curtains ── */
+.curtain-left,.curtain-right{position:absolute;top:-8px;bottom:-8px;width:52%;z-index:10;transition:clip-path 2.2s cubic-bezier(.77,0,.18,1);cursor:pointer;will-change:clip-path}
+.curtain-left{left:-8px;clip-path:inset(0 0 0 0);background:linear-gradient(90deg,#4a2020 0%,#5a2828 15%,#3a1818 30%,#5a2525 45%,#4a2020 60%,#3a1818 75%,#4a2020 100%);border-right:2px solid rgba(0,0,0,.3)}
+.curtain-right{right:-8px;clip-path:inset(0 0 0 0);background:linear-gradient(270deg,#4a2020 0%,#5a2828 15%,#3a1818 30%,#5a2525 45%,#4a2020 60%,#3a1818 75%,#4a2020 100%);border-left:2px solid rgba(0,0,0,.3)}
+
+/* Fabric fold lines */
+.curtain-left::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 18px,rgba(0,0,0,.08) 18px,rgba(0,0,0,.08) 19px,rgba(255,255,255,.02) 19px,rgba(255,255,255,.02) 20px);pointer-events:none}
+.curtain-right::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(270deg,transparent,transparent 18px,rgba(0,0,0,.08) 18px,rgba(0,0,0,.08) 19px,rgba(255,255,255,.02) 19px,rgba(255,255,255,.02) 20px);pointer-events:none}
+
+/* Curtain top valance */
+.curtain-left::after,.curtain-right::after{content:'';position:absolute;top:0;left:0;right:0;height:20px;background:linear-gradient(180deg,rgba(60,20,20,.6),transparent)}
+.curtain-right::after{left:auto;right:0}
+
+/* Open state */
+.curtains-open .curtain-left{clip-path:inset(0 100% 0 0)}
+.curtains-open .curtain-right{clip-path:inset(0 0 0 100%)}
+
+/* ── Curtain Rod ── */
+.curtain-rod{position:absolute;top:-6px;left:-20px;right:-20px;height:14px;z-index:11;background:linear-gradient(180deg,#3a2a1a,#2a1a0a,#3a2a1a);border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.5);pointer-events:none}
+.curtain-rod::before,.curtain-rod::after{content:'';position:absolute;top:50%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#c8a860,#8a6a30);box-shadow:inset 0 -2px 4px rgba(0,0,0,.3)}
+.curtain-rod::before{left:-10px}
+.curtain-rod::after{right:-10px}
+
+/* ── Pull Cord ── */
+.pull-cord{position:absolute;top:-4px;left:50%;transform:translateX(-50%);z-index:20;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:opacity 2s;opacity:1;pointer-events:auto}
+.curtains-open .pull-cord{opacity:0;pointer-events:none}
+.pull-cord-string{width:2px;height:clamp(80px,15vh,140px);background:linear-gradient(180deg,rgba(200,180,160,.5),rgba(200,180,160,.3));position:relative}
+.pull-cord-string::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:rgba(200,180,160,.4)}
+.pull-cord-tassel{width:20px;height:28px;background:linear-gradient(180deg,#8a2020,#5a1515);border-radius:0 0 50% 50% / 0 0 100% 100%;position:relative;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.pull-cord-tassel::before{content:'';position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:8px;height:6px;background:#c8a860;border-radius:50%;box-shadow:0 0 4px rgba(200,168,96,.3)}
+.pull-cord-tassel::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:10px solid #6a1818;border-radius:0 0 4px 4px}
+
+/* Pull cord hover */
+.pull-cord:hover .pull-cord-tassel{background:linear-gradient(180deg,#a02828,#6a1818)}
+.pull-cord:hover .pull-cord-tassel::before{background:#d4b060}
+
+/* Pull animation */
+.pull-cord.pulling .pull-cord-tassel{animation:pullDown .6s ease-out forwards}
+@keyframes pullDown{0%{transform:translateY(0)}50%{transform:translateY(20px)}100%{transform:translateY(0)}}
+
+/* ── Window ── */
+.window{position:absolute;inset:0;z-index:5;border:clamp(12px,2.5vw,28px) solid #2a1a0a;border-radius:4px;box-shadow:0 20px 80px rgba(0,0,0,.7),inset 0 0 30px rgba(0,0,0,.3);background:#1a1008;overflow:hidden}
+.window::before{content:'';position:absolute;inset:-4px;border:2px solid rgba(200,180,160,.08);border-radius:6px;pointer-events:none;z-index:30}
+.window::after{content:'';position:absolute;inset:0;box-shadow:inset 0 0 40px rgba(0,0,0,.4),inset 0 0 0 1px rgba(200,180,160,.05);pointer-events:none;z-index:30;border-radius:2px}
+
+/* Window inner shadow from frame */
+.window-inner-shadow{position:absolute;inset:-20px;box-shadow:inset 0 0 60px rgba(0,0,0,.5);pointer-events:none;z-index:29}
+
+/* ── Room Scene ── */
+.room-scene{position:absolute;inset:0;overflow:hidden}
+
+.room-wall{position:absolute;inset:0;background:linear-gradient(180deg,#3a2818 0%,#4a3020 20%,#3a2818 50%,#2a1a10 80%,#1a1008 100%);transition:filter 2s ease}
+.room-wall::before{content:'';position:absolute;inset:0;opacity:.06;background:repeating-linear-gradient(0deg,transparent,transparent 20px,rgba(200,180,160,.1) 20px,rgba(200,180,160,.1) 21px)}
+
+/* Wall texture */
+.room-wall::after{content:'';position:absolute;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px}
+
+/* Bookshelf silhouette */
+.bookshelf{position:absolute;right:8%;top:15%;width:22%;height:55%;display:flex;flex-direction:column;gap:6%;opacity:.25;pointer-events:none}
+.bookshelf .shelf{width:100%;height:18%;background:linear-gradient(180deg,rgba(60,40,20,.6),rgba(40,25,10,.4));border-radius:1px;position:relative}
+.bookshelf .shelf::before{content:'';position:absolute;top:2px;left:4px;right:4px;bottom:2px;background:repeating-linear-gradient(90deg,transparent,transparent 8px,rgba(150,120,80,.1) 8px,rgba(150,120,80,.1) 10px);border-radius:1px}
+
+/* Desk */
+.desk{position:absolute;bottom:0;left:-5%;right:-5%;height:28%;transform:perspective(600px) rotateX(8deg);transform-origin:bottom center;background:linear-gradient(180deg,#2a1a0a,#1a1008);border-top:2px solid rgba(200,180,160,.06);pointer-events:none}
+.desk::before{content:'';position:absolute;top:-20px;left:0;right:0;height:20px;background:linear-gradient(180deg,transparent,#1a1008)}
+
+/* Desk surface texture */
+.desk::after{content:'';position:absolute;inset:0;opacity:.04;background:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(200,180,160,.1) 3px,rgba(200,180,160,.1) 4px)}
+
+/* Desk lamp glow */
+.lamp-glow{position:absolute;left:15%;bottom:30%;width:40%;height:50%;background:radial-gradient(ellipse at 50% 100%,rgba(220,180,120,.12) 0%,rgba(220,180,120,.06) 30%,transparent 60%);pointer-events:none;transition:opacity 2s ease}
+.lamp-glow-night{position:absolute;left:10%;bottom:25%;width:50%;height:55%;background:radial-gradient(ellipse at 50% 100%,rgba(220,180,120,.18) 0%,rgba(220,180,120,.08) 30%,transparent 60%);pointer-events:none;opacity:0;transition:opacity 2s ease}
+
+/* ── Windowsill (inside the window) ── */
+.windowsill{position:absolute;bottom:0;left:0;right:0;height:clamp(50px,10vh,90px);z-index:8;background:linear-gradient(180deg,#3a2a1a,#2a1a0a);border-top:2px solid rgba(200,180,160,.06);pointer-events:none}
+.windowsill::before{content:'';position:absolute;top:-3px;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,rgba(200,180,160,.04),transparent)}
+.windowsill::after{content:'';position:absolute;inset:0;box-shadow:inset 0 4px 12px rgba(0,0,0,.3)}
+
+/* ── Items on Windowsill ── */
+.items{position:absolute;bottom:clamp(50px,10vh,90px);left:5%;right:5%;height:clamp(60px,12vh,100px);z-index:9;display:flex;justify-content:space-around;align-items:flex-end;pointer-events:none}
+
+.item{position:relative;pointer-events:auto;cursor:pointer;transition:transform .3s ease,filter .3s ease;flex-shrink:0}
+.item:hover{transform:translateY(-4px)}
+.item:active{transform:translateY(-2px)}
+
+/* ── Book ── */
+.item-book{width:clamp(28px,5vw,48px);height:clamp(20px,4vh,36px);margin-bottom:clamp(8px,1.5vh,14px)}
+.book-spine{width:100%;height:100%;background:linear-gradient(90deg,#5a3a20,#7a4a2a 30%,#8a5a3a 50%,#6a3a20 70%,#5a3a20);border-radius:2px;position:relative;box-shadow:2px 0 6px rgba(0,0,0,.3),-1px 0 3px rgba(0,0,0,.2)}
+.book-spine::before{content:'';position:absolute;top:30%;left:4px;right:4px;height:1px;background:rgba(200,180,160,.08)}
+.book-spine::after{content:'';position:absolute;top:55%;left:6px;right:6px;height:2px;background:rgba(200,180,160,.05)}
+
+/* ── Clock / Nixie ── */
+.item-clock{width:clamp(24px,4vw,40px);height:clamp(32px,6vh,50px);margin-bottom:clamp(4px,.8vh,8px)}
+.clock-body{width:100%;height:100%;background:linear-gradient(180deg,#4a3a2a,#3a2a1a,#2a1a0a);border-radius:3px 3px 2px 2px;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.clock-body::before{content:'88:88';position:absolute;top:12%;left:8%;right:8%;bottom:20%;background:#1a0800;color:rgba(220,120,60,.04);font-size:clamp(8px,1.4vw,14px);font-family:'Courier New',monospace;letter-spacing:2px;display:flex;align-items:center;justify-content:center;border-radius:1px;font-weight:700}
+.clock-body::after{content:'';position:absolute;bottom:6%;left:30%;right:30%;height:2px;background:rgba(200,180,160,.06);border-radius:1px}
+
+/* ── Water Glass ── */
+.item-glass{width:clamp(16px,3vw,28px);height:clamp(28px,5vh,42px);margin-bottom:clamp(6px,1vh,10px)}
+.glass-body{width:100%;height:100%;position:relative}
+.glass-body::before{content:'';position:absolute;inset:0;border:1.5px solid rgba(200,220,255,.15);border-radius:0 0 3px 3px;border-top:none;background:linear-gradient(180deg,rgba(180,210,255,.02),rgba(180,210,255,.06) 40%,rgba(150,180,220,.08) 60%,rgba(150,180,220,.04));box-shadow:inset 2px 0 6px rgba(200,220,255,.04),-1px 0 3px rgba(200,220,255,.02)}
+.glass-body::after{content:'';position:absolute;top:0;left:20%;width:60%;height:1px;background:rgba(200,220,255,.12)}
+.glass-water{position:absolute;bottom:2px;left:2px;right:2px;height:55%;background:linear-gradient(180deg,rgba(180,210,255,.06),rgba(150,180,220,.04));border-radius:0 0 2px 2px}
+.glass-water::before{content:'';position:absolute;top:-1px;left:10%;right:10%;height:1px;background:rgba(200,220,255,.08)}
+.glass-ripple{position:absolute;bottom:20%;left:10%;right:10%;height:2px;border-radius:50%;background:rgba(200,220,255,.08);transform:scaleX(0);transition:transform .6s ease-out}
+.glass-ripple.active{transform:scaleX(1)}
+.glass-ripple-2{position:absolute;bottom:35%;left:5%;right:5%;height:1.5px;border-radius:50%;background:rgba(200,220,255,.05);transform:scaleX(0);transition:transform .8s .1s ease-out}
+.glass-ripple-2.active{transform:scaleX(1)}
+
+/* ── Plant ── */
+.item-plant{width:clamp(30px,5vw,48px);height:clamp(36px,6vh,55px);margin-bottom:clamp(2px,.4vh,4px)}
+.plant-pot{position:absolute;bottom:0;left:15%;right:15%;height:35%;background:linear-gradient(180deg,#6a4a30,#4a2a18);border-radius:0 0 4px 4px / 0 0 8px 8px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.plant-pot::before{content:'';position:absolute;top:-2px;left:-4px;right:-4px;height:4px;background:linear-gradient(180deg,#7a5a3a,#5a3a20);border-radius:2px 2px 0 0;box-shadow:0 -1px 3px rgba(0,0,0,.1)}
+.plant-pot::after{content:'';position:absolute;bottom:2px;left:20%;right:20%;height:1px;background:rgba(200,180,160,.06)}
+.plant-stem{position:absolute;bottom:35%;left:50%;transform:translateX(-50%);width:2px;height:40%;background:linear-gradient(180deg,rgba(80,140,70,.3),rgba(80,140,70,.1));transform-origin:bottom center;transition:transform .3s ease}
+.plant-leaf{position:absolute;width:12px;height:6px;border-radius:50% 50% 50% 0;background:rgba(80,160,70,.2);transform-origin:bottom center}
+.plant-leaf-1{top:25%;left:50%;transform:translateX(-50%) rotate(-20deg)}
+.plant-leaf-2{top:40%;left:55%;transform:rotate(15deg)}
+.plant-leaf-3{top:50%;left:45%;transform:rotate(-25deg)}
+.plant-leaf-4{top:60%;left:52%;transform:rotate(10deg)}
+.item-plant:hover .plant-stem{transform:translateX(-50%) rotate(-3deg)}
+
+/* ── Glass Overlay (reflections + dust) ── */
+.glass-overlay{position:absolute;inset:0;z-index:15;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 2.5s 2s ease}
+.curtains-open .glass-overlay{opacity:1}
+
+/* Main reflection */
+.glass-overlay::before{content:'';position:absolute;top:-10%;left:-10%;width:50%;height:120%;background:linear-gradient(135deg,rgba(255,255,255,.02) 0%,rgba(255,255,255,.005) 30%,transparent 50%);transform:rotate(-15deg);pointer-events:none}
+
+/* Secondary reflection */
+.glass-overlay::after{content:'';position:absolute;bottom:-10%;right:-10%;width:40%;height:80%;background:linear-gradient(315deg,rgba(255,255,255,.015) 0%,rgba(255,255,255,.005) 30%,transparent 50%);transform:rotate(-10deg);pointer-events:none}
+
+/* Dust specks */
+.dust-1,.dust-2,.dust-3,.dust-4,.dust-5{position:absolute;border-radius:50%;background:rgba(255,255,255,.03)}
+.dust-1{width:3px;height:3px;top:15%;left:30%}
+.dust-2{width:2px;height:2px;top:60%;left:70%}
+.dust-3{width:4px;height:2px;top:35%;left:50%;border-radius:50%}
+.dust-4{width:2px;height:3px;top:75%;left:25%}
+.dust-5{width:1.5px;height:1.5px;top:20%;left:75%}
+
+/* Smudge */
+.glass-smudge{position:absolute;top:40%;left:55%;width:40px;height:30px;border-radius:50%;background:radial-gradient(rgba(255,255,255,.008),transparent 70%);pointer-events:none}
+
+/* ── Item Labels ── */
+.item-label{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(10,8,6,.8);backdrop-filter:blur(4px);color:#c8b8a0;padding:4px 10px;border-radius:3px;font-size:clamp(.6rem,.9vw,.75rem);letter-spacing:1px;opacity:0;transition:opacity .4s ease,transform .3s ease;pointer-events:none;font-weight:400;border:1px solid rgba(200,180,160,.08)}
+.item:hover .item-label{opacity:1}
+
+/* ── Item Descriptions (popup) ── */
+.item-desc{position:fixed;z-index:50;background:rgba(10,8,6,.92);backdrop-filter:blur(12px);border:1px solid rgba(200,180,160,.08);border-radius:8px;padding:clamp(16px,2.5vw,28px);color:#d0c0a8;max-width:min(360px,80vw);opacity:0;transform:translateY(10px) scale(.95);transition:all .4s cubic-bezier(.23,1,.32,1);pointer-events:none;box-shadow:0 16px 60px rgba(0,0,0,.5)}
+.item-desc.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.item-desc .icon{font-size:1.2rem;margin-bottom:8px;opacity:.6}
+.item-desc .title{font-weight:600;color:#e0d0b8;margin-bottom:6px;font-size:clamp(.9rem,1.1vw,1rem)}
+.item-desc .text{color:rgba(200,180,160,.7);font-size:clamp(.75rem,.9vw,.85rem);line-height:1.7;font-weight:300}
+.item-desc .text .highlight{color:rgba(200,180,160,.9)}
+.item-desc .dismiss{position:absolute;top:8px;right:10px;color:rgba(200,180,160,.25);font-size:1rem;cursor:pointer;transition:color .2s;line-height:1;pointer-events:auto}
+.item-desc .dismiss:hover{color:rgba(200,180,160,.6)}
+
+/* ── Timeline ── */
+.timeline{width:100%;margin-top:12px}
+.timeline-item{display:flex;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px solid rgba(200,180,160,.04);font-size:clamp(.65rem,.8vw,.75rem);color:rgba(200,180,160,.6)}
+.timeline-item:last-child{border-bottom:none}
+.timeline-item .time{font-family:'Courier New',monospace;color:rgba(200,180,160,.35);min-width:40px;font-size:clamp(.6rem,.7vw,.65rem)}
+.timeline-item .event{color:rgba(200,180,160,.7)}
+
+/* ── Rain Canvas ── */
+#rainCanvas{position:absolute;inset:0;z-index:14;pointer-events:none;opacity:0;transition:opacity 3s 1s ease}
+.curtains-open #rainCanvas{opacity:1}
+
+/* ── Ambient light overlay (time-based) ── */
+.ambient-light{position:absolute;inset:0;z-index:16;pointer-events:none;transition:opacity 3s ease;
+  background:radial-gradient(ellipse at 50% 30%,rgba(255,200,150,.04),transparent 60%);
+}
+.ambient-light.night{
+  background:radial-gradient(ellipse at 50% 30%,rgba(255,200,150,.06) 0%,rgba(50,60,120,.03) 40%,transparent 60%);
+}
+.ambient-light.evening{
+  background:radial-gradient(ellipse at 50% 30%,rgba(255,180,100,.08) 0%,rgba(200,150,80,.04) 30%,transparent 60%);
+}
+
+/* ── Window frame corner details ── */
+.corner{position:absolute;width:clamp(16px,3vw,30px);height:clamp(16px,3vw,30px);border-color:rgba(200,180,160,.05);z-index:20;pointer-events:none}
+.corner-tl{top:clamp(6px,1vw,12px);left:clamp(6px,1vw,12px);border-left:1px solid;border-top:1px solid}
+.corner-tr{top:clamp(6px,1vw,12px);right:clamp(6px,1vw,12px);border-right:1px solid;border-top:1px solid}
+.corner-bl{bottom:clamp(6px,1vw,12px);left:clamp(6px,1vw,12px);border-left:1px solid;border-bottom:1px solid}
+.corner-br{bottom:clamp(6px,1vw,12px);right:clamp(6px,1vw,12px);border-right:1px solid;border-bottom:1px solid}
+
+/* ── Hints ── */
+.hint{position:fixed;bottom:clamp(20px,4vh,40px);left:50%;transform:translateX(-50%);z-index:40;color:rgba(200,180,160,.2);font-size:clamp(.65rem,.8vw,.75rem);letter-spacing:3px;font-weight:300;transition:opacity 2s;text-align:center;pointer-events:none}
+.curtains-open .hint{opacity:0}
+
+/* ── Day/Night text ── */
+.time-indicator{position:fixed;top:clamp(16px,2.5vh,24px);right:clamp(16px,2.5vw,24px);z-index:40;color:rgba(200,180,160,.15);font-size:clamp(.55rem,.7vw,.65rem);letter-spacing:2px;font-family:'Courier New',monospace;pointer-events:none;transition:opacity 3s}
+.curtains-open .time-indicator{opacity:1}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+  .window-wrapper{width:100vw;height:100vh}
+  .curtain-rod{left:-12px;right:-12px}
+  .pull-cord-string{height:60px}
+}
+
+/* ── Entrance fade ── */
+.scene{opacity:0;animation:sceneFadeIn 2s 1s forwards}
+@keyframes sceneFadeIn{to{opacity:1}}
+
+/* ── Click ripple on items ── */
+.item-click-ripple{position:absolute;border:1px solid rgba(200,180,160,.1);border-radius:50%;animation:rippleOut .6s ease-out forwards;pointer-events:none;z-index:40}
+@keyframes rippleOut{0%{width:0;height:0;opacity:1}100%{width:80px;height:80px;opacity:0;top:-40px;left:-40px}}
+
+/* ── Hide scroll on items popup ── */
+body.popup-open .item{filter:brightness(.7) saturate(.5);transition:filter .4s}
+body.popup-open .item:hover{filter:brightness(.9) saturate(.7)}
+body.popup-open .item.active-item{filter:brightness(1.1) saturate(1);z-index:45}
+</style>
+</head>
+<body>
+
+<div class="scene">
+
+  <div class="window-wrapper" id="app">
+
+    <!-- Curtain rod -->
+    <div class="curtain-rod"></div>
+
+    <!-- Curtains -->
+    <div class="curtain-left"></div>
+    <div class="curtain-right"></div>
+
+    <!-- Pull Cord -->
+    <div class="pull-cord" id="pullCord">
+      <div class="pull-cord-string"></div>
+      <div class="pull-cord-tassel"></div>
+    </div>
+
+    <!-- Window -->
+    <div class="window" id="window">
+
+      <!-- Room Scene -->
+      <div class="room-scene" id="roomScene">
+        <div class="room-wall" id="roomWall"></div>
+
+        <!-- Bookshelf silhouette -->
+        <div class="bookshelf">
+          <div class="shelf"></div>
+          <div class="shelf"></div>
+          <div class="shelf"></div>
+        </div>
+
+        <!-- Lamp glow -->
+        <div class="lamp-glow"></div>
+        <div class="lamp-glow-night" id="lampNight"></div>
+
+        <!-- Desk -->
+        <div class="desk"></div>
+      </div>
+
+      <!-- Windowsill -->
+      <div class="windowsill"></div>
+
+      <!-- Items -->
+      <div class="items" id="items">
+        <!-- Book -->
+        <div class="item item-book" data-item="book">
+          <div class="book-spine"></div>
+          <span class="item-label">翻开的书</span>
+        </div>
+
+        <!-- Clock -->
+        <div class="item item-clock" data-item="clock">
+          <div class="clock-body"></div>
+          <span class="item-label">辉光管时钟</span>
+        </div>
+
+        <!-- Water Glass -->
+        <div class="item item-glass" data-item="glass">
+          <div class="glass-body">
+            <div class="glass-water">
+              <div class="glass-ripple" id="ripple1"></div>
+              <div class="glass-ripple-2" id="ripple2"></div>
+            </div>
+          </div>
+          <span class="item-label">半杯水</span>
+        </div>
+
+        <!-- Plant -->
+        <div class="item item-plant" data-item="plant">
+          <div class="plant-stem" id="plantStem">
+            <div class="plant-leaf plant-leaf-1"></div>
+            <div class="plant-leaf plant-leaf-2"></div>
+            <div class="plant-leaf plant-leaf-3"></div>
+            <div class="plant-leaf plant-leaf-4"></div>
+          </div>
+          <div class="plant-pot"></div>
+          <span class="item-label">绿植</span>
+        </div>
+      </div>
+
+      <!-- Glass Overlay -->
+      <div class="glass-overlay" id="glassOverlay">
+        <div class="dust-1"></div>
+        <div class="dust-2"></div>
+        <div class="dust-3"></div>
+        <div class="dust-4"></div>
+        <div class="dust-5"></div>
+        <div class="glass-smudge"></div>
+      </div>
+
+      <!-- Rain Canvas -->
+      <canvas id="rainCanvas"></canvas>
+
+      <!-- Ambient light -->
+      <div class="ambient-light" id="ambientLight"></div>
+
+      <!-- Inner shadow -->
+      <div class="window-inner-shadow"></div>
+
+      <!-- Corner details -->
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+    </div><!-- /window -->
+  </div><!-- /window-wrapper -->
+
+  <!-- Hint -->
+  <div class="hint" id="hint">拉一下绳子 · 拉开窗帘</div>
+
+  <!-- Time indicator -->
+  <div class="time-indicator" id="timeIndicator"></div>
+
+</div><!-- /scene -->
+
+<!-- Item Description Popups -->
+<div class="item-desc" id="descBook">
+  <span class="dismiss" onclick="closeDesc()">✕</span>
+  <div class="icon">📖</div>
+  <div class="title">摊开的笔记本</div>
+  <div class="text">
+    三月二十一日，晴。<br>
+    二买信号出现在十五分钟图上，像是某种默契。<br><br>
+    <span class="highlight">其实早上看了一眼就觉得今天会出信号——不是技术分析，是直觉。</span><br><br>
+    —— 摘自笔记 · 2026
+  </div>
+</div>
+
+<div class="item-desc" id="descClock">
+  <span class="dismiss" onclick="closeDesc()">✕</span>
+  <div class="icon">🕰️</div>
+  <div class="title">辉光管时钟 · 一日时间轴</div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <span class="time">05:30</span>
+      <span class="event">起床 · 交易复盘</span>
+    </div>
+    <div class="timeline-item">
+      <span class="time">09:00</span>
+      <span class="event">写代码</span>
+    </div>
+    <div class="timeline-item">
+      <span class="time">12:00</span>
+      <span class="event">午饭 · 看书</span>
+    </div>
+    <div class="timeline-item">
+      <span class="time">14:00</span>
+      <span class="event">写东西</span>
+    </div>
+    <div class="timeline-item">
+      <span class="time">16:30</span>
+      <span class="event">交易收盘</span>
+    </div>
+    <div class="timeline-item">
+      <span class="time">19:00</span>
+      <span class="event">学新东西</span>
+    </div>
+    <div class="timeline-item">
+      <span class="time">23:00</span>
+      <span class="event">看书 · 睡觉</span>
+    </div>
+  </div>
+</div>
+
+<div class="item-desc" id="descGlass">
+  <span class="dismiss" onclick="closeDesc()">✕</span>
+  <div class="icon">🥛</div>
+  <div class="title">半杯水</div>
+  <div class="text">
+    今天没算喝了几杯。<br><br>
+    <span class="highlight">反正这杯是第三杯了……也许是第四杯。</span>
+  </div>
+</div>
+
+<div class="item-desc" id="descPlant">
+  <span class="dismiss" onclick="closeDesc()">✕</span>
+  <div class="icon">🌱</div>
+  <div class="title">绿植</div>
+  <div class="text">
+    这盆养了 <span class="highlight">8 个月</span>了。<br><br>
+    比我预想的好。<br>
+    我以为它会跟上一盆一样，两个月就蔫了。
+  </div>
+</div>
+
+<script>
+// ── State ──
+const STATE = {
+  curtainsOpen: false,
+  descOpen: null,
+};
+
+// ── Curtains ──
+const pullCord = document.getElementById('pullCord');
+const app = document.getElementById('app');
+
+pullCord.addEventListener('click', () => {
+  if (STATE.curtainsOpen) return;
+
+  // Pull animation
+  pullCord.classList.add('pulling');
+
+  setTimeout(() => {
+    app.classList.add('curtains-open');
+    STATE.curtainsOpen = true;
+    pullCord.classList.remove('pulling');
+
+    // Start rain after curtain open
+    if (rainActive) startRain();
+  }, 300);
+});
+
+// ── Items ──
+const items = document.querySelectorAll('.item');
+const descs = {
+  book: document.getElementById('descBook'),
+  clock: document.getElementById('descClock'),
+  glass: document.getElementById('descGlass'),
+  plant: document.getElementById('descPlant'),
+};
+
+items.forEach(item => {
+  item.addEventListener('click', (e) => {
+    const key = item.dataset.item;
+    if (!key || !descs[key]) return;
+
+    // Ripple
+    const ripple = document.createElement('div');
+    ripple.className = 'item-click-ripple';
+    const rect = item.getBoundingClientRect();
+    ripple.style.left = (rect.width / 2) + 'px';
+    ripple.style.top = (rect.height / 2) + 'px';
+    item.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+
+    // Glass special effect
+    if (key === 'glass') {
+      document.getElementById('ripple1').classList.remove('active');
+      document.getElementById('ripple2').classList.remove('active');
+      void document.getElementById('ripple1').offsetWidth;
+      document.getElementById('ripple1').classList.add('active');
+      document.getElementById('ripple2').classList.add('active');
+    }
+
+    // Plant special effect
+    if (key === 'plant') {
+      const stem = document.getElementById('plantStem');
+      stem.style.transform = 'translateX(-50%) rotate(4deg)';
+      setTimeout(() => { stem.style.transform = 'translateX(-50%) rotate(-3deg)'; }, 200);
+      setTimeout(() => { stem.style.transform = 'translateX(-50%) rotate(0deg)'; }, 400);
+    }
+
+    // Toggle desc
+    if (STATE.descOpen === key) {
+      closeDesc();
+      return;
+    }
+
+    closeDesc();
+    openDesc(key, item);
+  });
+});
+
+function openDesc(key, item) {
+  const desc = descs[key];
+  if (!desc) return;
+
+  const rect = item.getBoundingClientRect();
+  const isRightSide = rect.left > window.innerWidth / 2;
+
+  desc.style.left = isRightSide ? 'auto' : (rect.right + 16) + 'px';
+  desc.style.right = isRightSide ? (window.innerWidth - rect.left + 16) + 'px' : 'auto';
+  desc.style.top = Math.min(rect.top, window.innerHeight - 300) + 'px';
+  desc.style.bottom = 'auto';
+
+  // Ensure it fits
+  if (rect.top + 300 > window.innerHeight) {
+    desc.style.top = (window.innerHeight - 300) + 'px';
+  }
+
+  // Add mobile adjustment
+  if (window.innerWidth < 600) {
+    desc.style.left = '50%';
+    desc.style.right = 'auto';
+    desc.style.top = '50%';
+    desc.style.transform = 'translate(-50%, -50%)';
+  }
+
+  desc.classList.add('show');
+  STATE.descOpen = key;
+  document.body.classList.add('popup-open');
+  item.classList.add('active-item');
+
+  // Close on click outside
+  setTimeout(() => {
+    document.addEventListener('click', closeDescOnOutside, true);
+  }, 100);
+}
+
+function closeDesc() {
+  Object.values(descs).forEach(d => d.classList.remove('show'));
+  document.body.classList.remove('popup-open');
+  items.forEach(i => i.classList.remove('active-item'));
+  STATE.descOpen = null;
+  document.removeEventListener('click', closeDescOnOutside, true);
+}
+
+function closeDescOnOutside(e) {
+  const isDesc = e.target.closest('.item-desc');
+  const isItem = e.target.closest('.item');
+  if (!isDesc && !isItem) closeDesc();
+}
+
+// ── Time Indicator & Lighting ──
+const timeIndicator = document.getElementById('timeIndicator');
+const ambientLight = document.getElementById('ambientLight');
+const roomWall = document.getElementById('roomWall');
+
+function updateTime() {
+  const now = new Date();
+  const h = now.getHours();
+  const m = now.getMinutes();
+  const timeStr = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  timeIndicator.textContent = timeStr;
+
+  // Clear classes
+  ambientLight.classList.remove('night', 'evening');
+
+  if (h >= 6 && h < 17) {
+    // Day
+    ambientLight.style.opacity = '0.3';
+    roomWall.style.filter = 'brightness(1)';
+  } else if (h >= 17 && h < 19) {
+    // Evening
+    ambientLight.classList.add('evening');
+    ambientLight.style.opacity = '0.6';
+    roomWall.style.filter = 'brightness(.85) saturate(1.1)';
+  } else {
+    // Night
+    ambientLight.classList.add('night');
+    ambientLight.style.opacity = '0.8';
+    roomWall.style.filter = 'brightness(.55) saturate(.8)';
+    document.getElementById('lampNight').style.opacity = '1';
+  }
+}
+
+updateTime();
+setInterval(updateTime, 30000);
+
+// ── Rain ──
+const canvas = document.getElementById('rainCanvas');
+const ctx = canvas.getContext('2d');
+let rainDrops = [];
+let rainActive = false;
+let rainAnimId = null;
+
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class RainDrop {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * -canvas.height;
+    this.length = Math.random() * 15 + 8;
+    this.speed = Math.random() * 4 + 3;
+    this.opacity = Math.random() * .15 + .05;
+    this.wind = Math.random() * .3 + .1;
+  }
+  update() {
+    this.y += this.speed;
+    this.x += this.wind;
+    if (this.y > canvas.height) this.reset();
+    if (this.x > canvas.width) this.x -= canvas.width;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x - this.wind, this.y - this.length);
+    ctx.strokeStyle = `rgba(180,200,230,${this.opacity})`;
+    ctx.lineWidth = .5;
+    ctx.stroke();
+  }
+}
+
+function initRain(count = 120) {
+  rainDrops = [];
+  for (let i = 0; i < count; i++) {
+    const drop = new RainDrop();
+    drop.y = Math.random() * canvas.height;
+    rainDrops.push(drop);
+  }
+}
+
+function animateRain() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  rainDrops.forEach(d => { d.update(); d.draw(); });
+  rainAnimId = requestAnimationFrame(animateRain);
+}
+
+function startRain() {
+  if (rainActive) return;
+  rainActive = true;
+  initRain(150);
+  animateRain();
+}
+
+function stopRain() {
+  rainActive = false;
+  if (rainAnimId) { cancelAnimationFrame(rainAnimId); rainAnimId = null; }
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// ── Keyboard short: ESC to close ──
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeDesc();
+});
+
+// ── Initial state ──
+// Default: curtains closed, no rain yet
+console.log('✦ 窗外 · Window ✦');
+</script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>包装设计 · 杨昀桦</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4efe6;
+    --panel: rgba(255,255,255,0.82);
+    --panel-strong: rgba(255,255,255,0.94);
+    --text: #171717;
+    --text-soft: rgba(23,23,23,0.68);
+    --line: rgba(23,23,23,0.1);
+    --grid: rgba(124,116,103,0.18);
+    --accent: #b26249;
+    --shadow: 0 20px 56px rgba(34,28,20,0.08);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(180deg, #f7f3eb 0%, #efe7db 100%);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.48;
+    z-index: 0;
+  }
+
+  .grid-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size:
+      calc((100vw - 4rem) / 12) 100%,
+      100% 11.111vh;
+    background-position: 2rem 0, 0 0;
+    background-repeat: repeat-x, repeat-y;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .back-link,
+  .home-link {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .intro,
+  .hero,
+  .proposal-grid,
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .intro {
+    align-items: end;
+    margin-bottom: 2.4rem;
+  }
+
+  .intro-copy { grid-column: 1 / span 7; }
+  .intro-meta { grid-column: 9 / span 4; display: grid; gap: 1rem; }
+
+  .eyebrow,
+  .section-label,
+  .meta-chip,
+  .shot-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .intro-copy h1 {
+    margin-top: 0.4rem;
+    margin-bottom: 1rem;
+    font-size: clamp(3rem, 8vw, 5.8rem);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+  }
+
+  .intro-copy p,
+  .meta-card p,
+  .section-copy,
+  .proposal-card p,
+  figcaption,
+  .hero-copy p {
+    color: var(--text-soft);
+  }
+
+  .intro-copy p,
+  .hero-copy p,
+  .section-copy { font-size: 1rem; }
+
+  .meta-card,
+  .hero-frame,
+  .proposal-card,
+  .shot {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.7rem;
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.62);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
+  }
+
+  .meta-card::before,
+  .hero-frame::before,
+  .proposal-card::before,
+  .shot::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.42), rgba(255,255,255,0.08) 45%, transparent 72%),
+      radial-gradient(circle at top left, rgba(255,255,255,0.8), transparent 34%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .meta-card > *,
+  .hero-frame > *,
+  .proposal-card > *,
+  .shot > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .meta-card:hover,
+  .hero-frame:hover,
+  .proposal-card:hover,
+  .shot:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 72px rgba(34,28,20,0.12);
+  }
+
+  .meta-card { padding: 1.05rem 1.15rem; }
+
+  .hero {
+    align-items: start;
+    margin-bottom: 2.6rem;
+  }
+
+  .hero-frame {
+    grid-column: 1 / span 8;
+    padding: 1rem;
+  }
+
+  .hero-frame img,
+  .shot img {
+    width: 100%;
+    display: block;
+    border-radius: 1.08rem;
+  }
+
+  .hero-frame img {
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: rgba(255,255,255,0.92);
+  }
+
+  .hero-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding-top: 0.85rem;
+  }
+
+  .hero-title {
+    font-size: 1.16rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-meta {
+    font-size: 0.82rem;
+    color: rgba(23,23,23,0.56);
+    white-space: nowrap;
+  }
+
+  .hero-copy {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .proposal-grid {
+    margin-bottom: 2.6rem;
+  }
+
+  .proposal-card {
+    padding: 1.2rem 1.2rem 1.3rem;
+  }
+
+  .proposal-card h3 {
+    margin-top: 0.45rem;
+    margin-bottom: 0.55rem;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .proposal-card p {
+    font-size: 0.92rem;
+  }
+
+  .proposal-card.brand { grid-column: span 4; }
+  .proposal-card.structure { grid-column: span 4; }
+  .proposal-card.application { grid-column: span 4; }
+
+  .section-heading {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-heading h2 {
+    margin-top: 0.4rem;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+  }
+
+  .section-copy {
+    max-width: 36rem;
+    margin-top: 0.8rem;
+  }
+
+  .detail-grid {
+    margin-bottom: 2rem;
+  }
+
+  .shot {
+    padding: 0.82rem;
+  }
+
+  .shot.large { grid-column: span 7; }
+  .shot.small { grid-column: span 5; }
+  .shot.full { grid-column: span 12; }
+
+  .shot img {
+    background: rgba(255,255,255,0.94);
+    object-fit: cover;
+  }
+
+  .stacked-shot {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .stacked-shot img {
+    width: 100%;
+    display: block;
+    border-radius: 1rem;
+    background: rgba(255,255,255,0.94);
+  }
+
+  figcaption {
+    padding-top: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 980px) {
+    .intro-copy,
+    .intro-meta,
+    .hero-frame,
+    .hero-copy,
+    .proposal-card.brand,
+    .proposal-card.structure,
+    .proposal-card.application,
+    .shot.large,
+    .shot.small,
+    .shot.full {
+      grid-column: span 12;
+    }
+
+    .hero-caption {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hero-meta {
+      white-space: normal;
+    }
+
+    .grid-overlay::before {
+      background-size: calc((100vw - 2rem) / 6) 100%, 100% 12.5vh;
+      background-position: 1rem 0, 0 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .page { padding: 1rem; }
+  }
+  @media (max-width: 520px) {
+    .page { padding: 0.75rem; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+    .back-link, .home-link { font-size: 0.72rem; }
+    .intro-copy h1 { font-size: 2.2rem; }
+    .intro-copy p { font-size: 0.92rem; }
+    .hero-frame { padding: 0.7rem; }
+    .hero-title { font-size: 1rem; }
+    .shot { padding: 0.7rem; }
+    .meta-card p { font-size: 0.86rem; }
+  }
+</style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+<div class="page">
+  <div class="topbar">
+    <a class="back-link" href="./index.html#works">Back to Works</a>
+    <a class="home-link" href="./index.html">杨昀桦 / YyUHua</a>
+  </div>
+
+  <section class="intro">
+    <div class="intro-copy">
+      <div class="eyebrow">Packaging Design · Nombox</div>
+      <h1>包装设计</h1>
+      <p>以 Nombox 为核心，围绕品牌识别、包装结构与应用场景完成整套包装设计提案。重点体现识别统一性、组合逻辑与实际落地效果。</p>
+    </div>
+    <div class="intro-meta">
+      <div class="meta-card">
+        <div class="meta-chip">Project Scope</div>
+        <p>品牌标志 / 包装结构 / 应用展示 / 宣传延展</p>
+      </div>
+      <div class="meta-card">
+        <div class="meta-chip">Design Focus</div>
+        <p>通过模块化结构与统一图形语言，让包装具备识别度、组合性和实际使用价值。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero">
+    <figure class="hero-frame">
+      <img src="./assets/packaging-05.jpg" alt="Nombox 包装主视觉展示图">
+      <figcaption class="hero-caption">
+        <div>
+          <div class="shot-label">Main Proposal View</div>
+          <div class="hero-title">提盒形式与品牌主视觉的第一印象</div>
+        </div>
+        <div class="hero-meta">Packaging Proposal / Visual & Structure</div>
+      </figcaption>
+    </figure>
+
+    <div class="hero-copy">
+      <div class="proposal-card">
+        <div class="section-label">Brand Tone</div>
+        <h3>识别图形简洁，包装印象明确</h3>
+        <p>以统一的品牌图形和配色系统贯穿整套包装，让产品在不同载体上保持清晰辨识度。</p>
+      </div>
+      <div class="proposal-card">
+        <div class="section-label">Structure Logic</div>
+        <h3>结构不是装饰，而是使用逻辑的一部分</h3>
+        <p>包装设计同时考虑叠放、组合、取用与展示，让结构本身成为品牌体验的一部分。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="proposal-grid">
+    <article class="proposal-card brand">
+      <div class="section-label">01 / Brand</div>
+      <h3>品牌识别建立</h3>
+      <p>通过图形符号、标准字和配色关系，建立统一的品牌视觉基础。</p>
+    </article>
+    <article class="proposal-card structure">
+      <div class="section-label">02 / Structure</div>
+      <h3>模块化结构展开</h3>
+      <p>围绕三角结构展开包装逻辑，让不同容量和组合方式具备延展可能。</p>
+    </article>
+    <article class="proposal-card application">
+      <div class="section-label">03 / Application</div>
+      <h3>应用场景与传播延展</h3>
+      <p>从包装本体延伸到提盒、宣传海报与产品展示，形成完整的商业提案表达。</p>
+    </article>
+  </section>
+
+  <section class="section-heading">
+    <div class="section-label">Selected Views</div>
+    <h2>从标志到结构，再到成套展示。</h2>
+    <p class="section-copy">用商业提案的顺序呈现关键信息：先建立品牌，再解释结构，最后展示包装在真实应用中的完成度。</p>
+  </section>
+
+  <section class="detail-grid">
+    <figure class="shot large">
+      <img src="./assets/packaging-02.png" alt="Nombox 标志设计图">
+      <figcaption>品牌标志与基础识别系统</figcaption>
+    </figure>
+
+    <figure class="shot small">
+      <img src="./assets/packaging-01.png" alt="Nombox 产品延展展示图">
+      <figcaption>洗洁精与筷子包装延展</figcaption>
+    </figure>
+
+    <figure class="shot large">
+      <img src="./assets/packaging-03.jpg" alt="包装结构拆解图">
+      <figcaption>包装结构拆解与组合方式说明</figcaption>
+    </figure>
+
+    <figure class="shot small">
+      <img src="./assets/packaging-04.jpg" alt="提盒包装展示图">
+      <figcaption>提盒形式与便携性展示</figcaption>
+    </figure>
+
+    <figure class="shot small">
+      <div class="stacked-shot">
+        <img src="./assets/packaging-06.jpg" alt="包装信息版面展示图">
+        <img src="./assets/packaging-08.png" alt="包装宣传海报图">
+      </div>
+      <figcaption>包装信息层级与版面表达</figcaption>
+    </figure>
+
+    <figure class="shot large">
+      <img src="./assets/packaging-07.jpg" alt="包装立体组合展示图">
+      <figcaption>包装模块组合后的整体效果</figcaption>
+    </figure>
+  </section>
+</div>
+</body>
+</html>
