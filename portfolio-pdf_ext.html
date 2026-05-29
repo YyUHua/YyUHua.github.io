@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>杨昀桦 · 作品集</title>
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    font-size: 14px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", -apple-system, sans-serif;
+    color: #1a1a1a;
+    background: #fff;
+    line-height: 1.7;
+  }
+
+  .page {
+    width: 297mm;
+    height: 210mm;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    background: #fff;
+  }
+
+  .page:last-child { page-break-after: auto; }
+
+  /* ===== COVER (landscape) ===== */
+  .cover {
+    display: flex;
+    align-items: center;
+    padding: 0 18mm;
+    background: #fafaf8;
+  }
+
+  .cover-left {
+    flex: 0 0 55%;
+  }
+
+  .cover-right {
+    flex: 1;
+    text-align: right;
+  }
+
+  .cover-eyebrow {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 2rem;
+  }
+
+  .cover-name {
+    font-size: 5.6rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .cover-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 2.5rem;
+  }
+
+  .cover-line {
+    width: 50mm;
+    height: 1px;
+    background: #d0d0d0;
+    margin-bottom: 2.5rem;
+  }
+
+  .cover-meta {
+    font-size: 0.65rem;
+    color: #999;
+    letter-spacing: 0.08em;
+  }
+
+  .cover-meta span { margin: 0 0.5rem; }
+
+  .cover-right .cover-num {
+    font-size: 5rem;
+    font-weight: 900;
+    color: #f0f0f0;
+    line-height: 1;
+  }
+
+  /* ===== PROJECT PAGE (landscape: text left, image right) ===== */
+  .project-page {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    height: 100%;
+  }
+
+  .project-left {
+    padding: 16mm 10mm 12mm 16mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .project-right {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8mm;
+  }
+
+  .project-right img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .project-right.cover-fit {
+    padding: 0;
+  }
+
+  .project-right.cover-fit img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .section-num {
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #bbb;
+    margin-bottom: 3mm;
+  }
+
+  .project-client {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-bottom: 1mm;
+  }
+
+  .project-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 5mm;
+  }
+
+  .project-desc {
+    font-size: 0.68rem;
+    color: #777;
+    line-height: 1.8;
+    margin-bottom: 8mm;
+  }
+
+  .project-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3mm;
+    padding-top: 4mm;
+    border-top: 1px solid #e8e8e8;
+  }
+
+  .meta-item {
+    display: flex;
+    gap: 3mm;
+  }
+
+  .meta-item-label {
+    font-size: 0.48rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #bbb;
+    min-width: 18mm;
+  }
+
+  .meta-item-value {
+    font-size: 0.6rem;
+    color: #555;
+  }
+
+  .page-num {
+    position: absolute;
+    bottom: 6mm;
+    right: 10mm;
+    font-size: 0.45rem;
+    color: #ccc;
+    letter-spacing: 0.1em;
+  }
+
+  /* ===== GALLERY PAGE (landscape) ===== */
+  .gallery-page {
+    display: grid;
+    grid-template-columns: 1fr 2.5fr;
+    height: 100%;
+  }
+
+  .gallery-left {
+    padding: 16mm 10mm 12mm 16mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .gallery-right {
+    padding: 10mm 12mm 10mm 4mm;
+    display: flex;
+    align-items: center;
+  }
+
+  .gallery-grid {
+    display: grid;
+    gap: 4mm;
+    width: 100%;
+    height: 100%;
+  }
+
+  .gallery-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .gallery-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .gallery-grid.rows-2 { grid-template-rows: 1fr 1fr; }
+
+  .gallery-item {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f8f6;
+    position: relative;
+  }
+
+  .gallery-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .gallery-title-sm {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 3mm;
+  }
+
+  .gallery-desc {
+    font-size: 0.62rem;
+    color: #777;
+    line-height: 1.7;
+  }
+
+  /* ===== ABOUT PAGE (landscape) ===== */
+  .about-page {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    height: 100%;
+  }
+
+  .about-left {
+    padding: 18mm 10mm 14mm 18mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .about-right {
+    padding: 18mm 18mm 14mm 6mm;
+    display: flex;
+    align-items: center;
+  }
+
+  .about-text h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 5mm;
+    line-height: 1;
+  }
+
+  .about-text p {
+    font-size: 0.66rem;
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 3mm;
+  }
+
+  .about-text .highlight { color: #333; }
+
+  .about-stats-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4mm;
+    width: 100%;
+  }
+
+  .stat-card {
+    padding: 5mm 4mm;
+    border: 1px solid #e8e8e8;
+  }
+
+  .stat-num {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 2mm;
+    color: #333;
+  }
+
+  .stat-label {
+    font-size: 0.5rem;
+    color: #999;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+  }
+
+  .tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5mm;
+    margin-top: 4mm;
+  }
+
+  .tool-tag {
+    font-size: 0.48rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+    padding: 1mm 2.5mm;
+    border: 1px solid #e0e0e0;
+    border-radius: 99px;
+  }
+
+  /* ===== CONTACT PAGE ===== */
+  .contact-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #fafaf8;
+  }
+
+  .contact-inner h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 6mm;
+  }
+
+  .contact-inner p {
+    font-size: 0.68rem;
+    color: #888;
+    margin-bottom: 2mm;
+  }
+
+  .contact-inner .contact-email {
+    font-size: 1rem;
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 6mm;
+  }
+
+  .contact-links {
+    font-size: 0.58rem;
+    color: #aaa;
+    letter-spacing: 0.08em;
+  }
+
+  .contact-links span { margin: 0 1mm; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; }
+    .page { page-break-after: always; }
+  }
+
+  @media screen {
+    body { background: #eee; padding: 20px; }
+    .page {
+      margin: 20px auto;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== COVER ===== -->
+<div class="page cover">
+  <div class="cover-left">
+    <div class="cover-eyebrow">Graphic Designer · Portfolio 2026</div>
+    <div class="cover-name">杨昀桦</div>
+    <div class="cover-title">Visual Systems / Editorial Layout / Spatial Signage</div>
+    <div class="cover-line"></div>
+    <div class="cover-meta">
+      Chengdu<span>·</span>yyuhua@163.com<span>·</span>4 Years
+    </div>
+  </div>
+  <div class="cover-right">
+    <div class="cover-num">01</div>
+  </div>
+  <div class="page-num">01 / 09</div>
+</div>
+
+<!-- ===== 01 成都大运会 ===== -->
+<div class="page project-page">
+  <div class="project-left">
+    <div class="section-num">02</div>
+    <div class="project-client">Chengdu 2021 FISU World University Games · 2023</div>
+    <div class="project-title">成都大运会<br>视觉系统</div>
+    <div class="project-desc">围绕成都大运会展开的视觉延展与空间落地，覆盖媒体工作间、悬挂导视、图形语言与系列应用。从概念提案到物料执行的全链路视觉交付。</div>
+    <div class="project-meta">
+      <div class="meta-item"><span class="meta-item-label">Type</span><span class="meta-item-value">Visual System / Signage</span></div>
+      <div class="meta-item"><span class="meta-item-label">Client</span><span class="meta-item-value">Chengdu 2021 FISU</span></div>
+      <div class="meta-item"><span class="meta-item-label">Role</span><span class="meta-item-value">Visual Design / Spatial</span></div>
+    </div>
+  </div>
+  <div class="project-right cover-fit">
+    <img src="assets/a0e8e89a4ce6f4c42b2ec6eb9e0829a8.jpg" alt="成都大运会场馆">
+  </div>
+  <div class="page-num">02 / 09</div>
+</div>
+
+<!-- 大运会 Gallery -->
+<div class="page gallery-page">
+  <div class="gallery-left">
+    <div class="section-num">02.1</div>
+    <div class="gallery-title-sm">导视与图形系统</div>
+    <div class="gallery-desc">媒体工作间悬挂导视系统、竖版视觉方案、主视觉延展与图形系统应用。</div>
+  </div>
+  <div class="gallery-right">
+    <div class="gallery-grid cols-2 rows-2">
+      <div class="gallery-item"><img src="assets/媒体工作间-悬挂导视.png" alt="媒体工作间悬挂导视"></div>
+      <div class="gallery-item"><img src="assets/A6.png" alt="竖版视觉方案"></div>
+      <div class="gallery-item"><img src="assets/E.1.png" alt="主视觉延展"></div>
+      <div class="gallery-item"><img src="assets/1.png" alt="图形系统应用"></div>
+    </div>
+  </div>
+  <div class="page-num">03 / 09</div>
+</div>
+
+<!-- ===== 02 风水画 ===== -->
+<div class="page project-page">
+  <div class="project-left">
+    <div class="section-num">03</div>
+    <div class="project-client">Tuartoo · Product Visual · 2026</div>
+    <div class="project-title">五行画吉<br>风水画设计</div>
+    <div class="project-desc">围绕五行画吉系列展开水、土、火、金、木与五行和合六张作品。重点呈现画面氛围、五行属性与对应寓意，以及它们作为产品视觉时的整体表达。</div>
+    <div class="project-meta">
+      <div class="meta-item"><span class="meta-item-label">Type</span><span class="meta-item-value">Product Visual</span></div>
+      <div class="meta-item"><span class="meta-item-label">Client</span><span class="meta-item-value">Tuartoo / 图阿凸</span></div>
+      <div class="meta-item"><span class="meta-item-label">Scope</span><span class="meta-item-value">Series Cover × 6</span></div>
+    </div>
+  </div>
+  <div class="project-right">
+    <img src="assets/d14a417be86a28c9d8d8e9d80e7d6d33.jpg" alt="五行画吉系列封面">
+  </div>
+  <div class="page-num">04 / 09</div>
+</div>
+
+<!-- 风水画五行 Grid -->
+<div class="page gallery-page">
+  <div class="gallery-left">
+    <div class="section-num">03.1</div>
+    <div class="gallery-title-sm">五行元素</div>
+    <div class="gallery-desc">水 · 土 · 火 · 金 · 木 · 五行和合，六幅作品各表五行属性与画面气质。</div>
+  </div>
+  <div class="gallery-right">
+    <div class="gallery-grid cols-3 rows-2">
+      <div class="gallery-item"><img src="assets/水.jpeg" alt="水"></div>
+      <div class="gallery-item"><img src="assets/土.jpeg" alt="土"></div>
+      <div class="gallery-item"><img src="assets/火.jpeg" alt="火"></div>
+      <div class="gallery-item"><img src="assets/金.jpeg" alt="金"></div>
+      <div class="gallery-item"><img src="assets/木.jpeg" alt="木"></div>
+      <div class="gallery-item"><img src="assets/五行和合.jpeg" alt="五行和合"></div>
+    </div>
+  </div>
+  <div class="page-num">05 / 09</div>
+</div>
+
+<!-- ===== 03 科幻大会 ===== -->
+<div class="page project-page">
+  <div class="project-left">
+    <div class="section-num">04</div>
+    <div class="project-client">World Science Fiction Convention · 2023</div>
+    <div class="project-title">第81届<br>世界科幻大会</div>
+    <div class="project-desc">围绕第81届世界科幻大会展开主视觉与活动传播表达，从黑白方案的秩序张力延伸到彩色的在地气质与公共传播适配，延展出更具未来感与识别度的大会形象系统。</div>
+    <div class="project-meta">
+      <div class="meta-item"><span class="meta-item-label">Type</span><span class="meta-item-value">Key Visual / Event Identity</span></div>
+      <div class="meta-item"><span class="meta-item-label">Client</span><span class="meta-item-value">World SF Convention</span></div>
+      <div class="meta-item"><span class="meta-item-label">Role</span><span class="meta-item-value">Visual Identity Design</span></div>
+    </div>
+  </div>
+  <div class="project-right">
+    <img src="assets/4541ce77e4247c30d6e7fc7a9ef8af4c.jpg" alt="第81届世界科幻大会封面">
+  </div>
+  <div class="page-num">06 / 09</div>
+</div>
+
+<!-- ===== 04 海报设计 ===== -->
+<div class="page gallery-page">
+  <div class="gallery-left">
+    <div class="section-num">05</div>
+    <div class="gallery-title-sm">个人海报设计</div>
+    <div class="gallery-desc">海报练习作品，重点在版式秩序、留白控制与图文关系处理。</div>
+  </div>
+  <div class="gallery-right">
+    <div class="gallery-grid cols-2 rows-2">
+      <div class="gallery-item"><img src="assets/poster-wide-01.jpg" alt="海报1"></div>
+      <div class="gallery-item"><img src="assets/poster-wide-02.jpg" alt="海报2"></div>
+      <div class="gallery-item"><img src="assets/poster-wide-03.jpg" alt="海报3"></div>
+      <div class="gallery-item"><img src="assets/poster-cover.png" alt="海报封面"></div>
+    </div>
+  </div>
+  <div class="page-num">07 / 09</div>
+</div>
+
+<!-- ===== 05 包装设计 ===== -->
+<div class="page project-page">
+  <div class="project-left">
+    <div class="section-num">06</div>
+    <div class="project-client">Packaging Design · Nombox</div>
+    <div class="project-title">包装设计</div>
+    <div class="project-desc">以 Nombox 为核心，围绕品牌识别、包装结构与应用场景完成整套包装设计提案。重点体现识别统一性、组合逻辑与实际落地效果。</div>
+    <div class="project-meta">
+      <div class="meta-item"><span class="meta-item-label">Type</span><span class="meta-item-value">Branding / Packaging</span></div>
+      <div class="meta-item"><span class="meta-item-label">Client</span><span class="meta-item-value">Nombox</span></div>
+      <div class="meta-item"><span class="meta-item-label">Scope</span><span class="meta-item-value">Logo / Structure / Display</span></div>
+    </div>
+  </div>
+  <div class="project-right">
+    <img src="assets/packaging-cover.png" alt="包装设计主视觉">
+  </div>
+  <div class="page-num">08 / 09</div>
+</div>
+
+<!-- ===== About ===== -->
+<div class="page about-page">
+  <div class="about-left">
+    <div class="section-num">07</div>
+    <div class="about-text">
+      <h2>Experience</h2>
+      <p>4 年平面设计工作经验，主要做视觉系统、空间导视、展览设计与品牌排版，能从前期概念提案一路跟到后期落地执行。</p>
+      <p>项目类型覆盖国际赛事、文化展览、城市空间与公共传播物料。做过成都大运会视觉系统、世界科幻大会主视觉、金沙遗址博物馆展览设计，以及机场户外海报系列。</p>
+      <p class="highlight">持续探索 AI 与设计的交叉地带——从零搭建多 Agent 协作架构，做过语音 AI 面板、交互式叙事平台等项目，目的是搞清楚 AI 到底能怎么扩展一个设计师的表达边界。</p>
+      <div class="tools-row">
+        <span class="tool-tag">PS</span>
+        <span class="tool-tag">AI</span>
+        <span class="tool-tag">CDR</span>
+        <span class="tool-tag">AE</span>
+        <span class="tool-tag">ChatGPT</span>
+        <span class="tool-tag">Claude</span>
+        <span class="tool-tag">Hermes</span>
+      </div>
+    </div>
+  </div>
+  <div class="about-right">
+    <div class="about-stats-inner">
+      <div class="stat-card"><div class="stat-num">4+</div><div class="stat-label">Years / 设计工作经验</div></div>
+      <div class="stat-card"><div class="stat-num">赛事</div><div class="stat-label">国际赛事视觉 / Visual System</div></div>
+      <div class="stat-card"><div class="stat-num">展览</div><div class="stat-label">博物馆与空间导视 / Exhibition & Spatial</div></div>
+      <div class="stat-card"><div class="stat-num">落地</div><div class="stat-label">从概念提案到执行交付</div></div>
+    </div>
+  </div>
+  <div class="page-num">09 / 09</div>
+</div>
+
+</body>
+</html>
