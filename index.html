@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>杨昀桦 · YyUHua — Graphic Designer</title>
+<script>history.scrollRestoration='manual'</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -30,7 +31,17 @@
     color: var(--text);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .page-scroller {
+    position: fixed;
+    inset: 0;
+    overflow-y: auto;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    z-index: 2;
   }
 
   a { color: inherit; }
@@ -38,7 +49,7 @@
   .grid-overlay {
     position: fixed;
     inset: 0;
-    z-index: 2;
+    z-index: 3;
     pointer-events: none;
     opacity: 0.52;
   }
@@ -136,7 +147,6 @@
 
   main {
     position: relative;
-    z-index: 1;
   }
 
   section {
@@ -172,6 +182,26 @@
       radial-gradient(circle at 80% 68%, rgba(200, 76, 53, 0.08), transparent 24%),
       linear-gradient(180deg, rgba(255,255,255,0.46), rgba(255,255,255,0.1));
     z-index: 0;
+  }
+
+  .hero-video {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 1;
+  }
+
+  .hero-glass {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    backdrop-filter: blur(28px) saturate(110%);
+    -webkit-backdrop-filter: blur(28px) saturate(110%);
+    background: rgba(255, 255, 255, 0.10);
+    pointer-events: none;
   }
 
   .hero-motion {
@@ -466,6 +496,7 @@
     content: "";
     position: absolute;
     inset: 0;
+    border-radius: inherit;
     background:
       linear-gradient(112deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.16) 18%, transparent 42%),
       linear-gradient(180deg, rgba(255,255,255,0.22), transparent 20%, transparent 78%, rgba(255,255,255,0.1));
@@ -938,10 +969,23 @@
     gap: 1.5rem;
   }
 
+  .about-panel {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    gap: 1.5rem;
+    padding: 2rem 2.2rem;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+  }
+
   .about-text {
     grid-column: 1 / span 6;
     font-size: 1.05rem;
-    color: rgba(23, 23, 23, 0.74);
+    color: rgba(23, 23, 23, 0.78);
     line-height: 1.95;
   }
 
@@ -1134,6 +1178,19 @@
     gap: 1.5rem;
   }
 
+  .contact-panel {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    gap: 1.5rem;
+    padding: 2rem 2.2rem;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+  }
+
   .contact-text {
     grid-column: 1 / span 6;
   }
@@ -1141,7 +1198,7 @@
   .contact-text p {
     font-size: 1.18rem;
     line-height: 1.9;
-    color: rgba(23, 23, 23, 0.72);
+    color: rgba(23, 23, 23, 0.82);
   }
 
   .contact-links {
@@ -1153,15 +1210,17 @@
   }
 
   .contact-links a {
-    padding-bottom: 0.75rem;
+    padding: 0.6rem 0 0.75rem;
+    padding-left: 0.2rem;
     text-decoration: none;
     border-bottom: 1px solid rgba(23, 23, 23, 0.12);
-    transition: border-color 0.3s ease, color 0.3s ease;
+    transition: border-color 0.3s ease, color 0.3s ease, padding-left 0.25s ease;
   }
 
   .contact-links a:hover {
     border-color: rgba(23, 23, 23, 0.5);
     color: var(--accent);
+    padding-left: 0.6rem;
   }
 
   footer {
@@ -1333,18 +1392,22 @@
 </style>
 </head>
 <body>
-<div class="grid-overlay"></div>
+  <video class="hero-video" muted playsinline preload="auto" id="heroVideo">
+    <source src="hero-bg.mp4" type="video/mp4">
+  </video>
+  <div class="hero-glass"></div>
+  <div class="grid-overlay"></div>
 
 <nav>
   <div class="logo">杨昀桦 / YyUHua</div>
   <div class="links">
     <a href="#works">Works</a>
     <a href="#about">About</a>
-    <a href="#writing">Writing</a>
     <a href="#contact">Contact</a>
   </div>
 </nav>
 
+<div class="page-scroller" id="pageScroller">
 <main>
   <section class="hero" id="hero">
     <div class="hero-stage">
@@ -1470,42 +1533,44 @@
       <h2>Experience</h2>
     </div>
     <div class="about-grid">
-      <div class="about-text">
-        <p><strong>杨昀桦，25 岁，INFP。</strong> 4 年平面设计工作经验，主要做视觉系统、空间导视、展览设计与品牌排版，能从前期概念提案一路跟到后期落地执行。</p>
-        <br>
-        <p>项目类型覆盖国际赛事、文化展览、城市空间与公共传播物料。做过成都大运会视觉系统、世界科幻大会主视觉、金沙遗址博物馆展览设计，以及机场户外海报系列。</p>
-        <br>
-        <p>喜欢陀思妥耶夫斯基，喜欢唱歌，也常听陈奕迅。工作之外会一直看书；这些兴趣不会直接变成画面风格，但会慢慢进入我对情绪、结构和表达方式的判断里。</p>
-        <br>
-        <p>除此之外，我还在持续探索 AI 与设计的交叉地带。从零搭过多 Agent 协作架构，让四个 AI Agent 通过消息总线协同工作；做过白龙马语音面板（贾维斯），TTS 语音合成 + 声波粒子可视化 + 实时流式对话；构建了天堂城邦——一个带世界观、地图与角色 AI 的交互式叙事平台。经手的 AI 项目还包括交易策略引擎、像素风 Agent 可视化办公室、开源 Agent 记忆系统等。不是为了转行写代码，而是想搞清楚：AI 到底能怎么扩展一个设计师的表达边界。</p>
-        <div class="tool-icons" aria-label="常用工具与AI平台">
-          <div class="tool-chip"><span class="text-badge">PS</span><span>PS</span></div>
-          <div class="tool-chip"><span class="text-badge">AI</span><span>AI</span></div>
-          <div class="tool-chip"><span class="text-badge">CD</span><span>CDR</span></div>
-          <div class="tool-chip"><span class="text-badge">AE</span><span>AE</span></div>
-          <div class="tool-chip"><span class="text-badge">CG</span><span>ChatGPT</span></div>
-          <div class="tool-chip"><span class="text-badge">GM</span><span>Gemini</span></div>
-          <div class="tool-chip"><span class="text-badge">OC</span><span>OpenClaw</span></div>
-          <div class="tool-chip"><span class="text-badge">H</span><span>Hermes</span></div>
-          <div class="tool-chip"><span class="text-badge">CL</span><span>Claude</span></div>
+      <div class="about-panel">
+        <div class="about-text">
+          <p><strong>杨昀桦，25 岁，INFP。</strong> 4 年平面设计工作经验，主要做视觉系统、空间导视、展览设计与品牌排版，能从前期概念提案一路跟到后期落地执行。</p>
+          <br>
+          <p>项目类型覆盖国际赛事、文化展览、城市空间与公共传播物料。做过成都大运会视觉系统、世界科幻大会主视觉、金沙遗址博物馆展览设计，以及机场户外海报系列。</p>
+          <br>
+          <p>喜欢陀思妥耶夫斯基，喜欢唱歌，也常听陈奕迅。工作之外会一直看书；这些兴趣不会直接变成画面风格，但会慢慢进入我对情绪、结构和表达方式的判断里。</p>
+          <br>
+          <p>除此之外，我还在持续探索 AI 与设计的交叉地带。从零搭过多 Agent 协作架构，让四个 AI Agent 通过消息总线协同工作；做过白龙马语音面板（贾维斯），TTS 语音合成 + 声波粒子可视化 + 实时流式对话；构建了天堂城邦——一个带世界观、地图与角色 AI 的交互式叙事平台。经手的 AI 项目还包括交易策略引擎、像素风 Agent 可视化办公室、开源 Agent 记忆系统等。不是为了转行写代码，而是想搞清楚：AI 到底能怎么扩展一个设计师的表达边界。</p>
+          <div class="tool-icons" aria-label="常用工具与AI平台">
+            <div class="tool-chip"><span class="text-badge">PS</span><span>PS</span></div>
+            <div class="tool-chip"><span class="text-badge">AI</span><span>AI</span></div>
+            <div class="tool-chip"><span class="text-badge">CD</span><span>CDR</span></div>
+            <div class="tool-chip"><span class="text-badge">AE</span><span>AE</span></div>
+            <div class="tool-chip"><span class="text-badge">CG</span><span>ChatGPT</span></div>
+            <div class="tool-chip"><span class="text-badge">GM</span><span>Gemini</span></div>
+            <div class="tool-chip"><span class="text-badge">OC</span><span>OpenClaw</span></div>
+            <div class="tool-chip"><span class="text-badge">H</span><span>Hermes</span></div>
+            <div class="tool-chip"><span class="text-badge">CL</span><span>Claude</span></div>
+          </div>
         </div>
-      </div>
-      <div class="about-stats">
-        <div class="stat">
-          <div class="num">4+</div>
-          <div class="label">Years / 设计工作经验</div>
-        </div>
-        <div class="stat">
-          <div class="num">赛事</div>
-          <div class="label">国际赛事视觉 / Visual System</div>
-        </div>
-        <div class="stat">
-          <div class="num">展览</div>
-          <div class="label">博物馆与空间导视 / Exhibition & Spatial</div>
-        </div>
-        <div class="stat">
-          <div class="num">落地</div>
-          <div class="label">从概念提案到执行交付</div>
+        <div class="about-stats">
+          <div class="stat">
+            <div class="num">4+</div>
+            <div class="label">Years / 设计工作经验</div>
+          </div>
+          <div class="stat">
+            <div class="num">赛事</div>
+            <div class="label">国际赛事视觉 / Visual System</div>
+          </div>
+          <div class="stat">
+            <div class="num">展览</div>
+            <div class="label">博物馆与空间导视 / Exhibition & Spatial</div>
+          </div>
+          <div class="stat">
+            <div class="num">落地</div>
+            <div class="label">从概念提案到执行交付</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1548,19 +1613,22 @@
       <h2>Contact</h2>
     </div>
     <div class="contact-inner">
-      <div class="contact-text">
-        <p>寻找视觉设计岗位，坐标成都。<br>期待一份能让设计说话的工作。</p>
-      </div>
-      <div class="contact-links">
-        <a href="mailto:18349862535@163.com">18349862535@163.com</a>
-        <a href="https://github.com/YyUHua" target="_blank" rel="noreferrer">GitHub / YyUHua</a>
-        <a href="https://gitee.com/YyUHua" target="_blank" rel="noreferrer">Gitee / YyUHua</a>
+      <div class="contact-panel">
+        <div class="contact-text">
+          <p>寻找视觉设计岗位，坐标成都。<br>期待一份能让设计说话的工作。</p>
+        </div>
+        <div class="contact-links">
+          <a href="mailto:18349862535@163.com">18349862535@163.com</a>
+          <a href="https://github.com/YyUHua" target="_blank" rel="noreferrer">GitHub / YyUHua</a>
+          <a href="https://gitee.com/YyUHua" target="_blank" rel="noreferrer">Gitee / YyUHua</a>
+        </div>
       </div>
     </div>
   </section>
 </main>
 
 <footer>&copy; 2026 杨昀桦 YyUHua. All rights reserved.</footer>
+</div><!-- .page-scroller -->
 
 <script>
   const heroMotion = document.getElementById('hero-motion');
@@ -1602,6 +1670,95 @@
   }
 
   animateHero();
+</script>
+<script>
+  /* ── Scroll-driven video playback ── */
+  (() => {
+    const scroller = document.getElementById('pageScroller');
+    const video = document.getElementById('heroVideo');
+    let ticking = false;
+    let videoReady = false;
+    let duration = 0;
+
+    function initVideo() {
+      if (!video) return;
+      duration = video.duration || 0;
+      videoReady = video.readyState >= 1;
+      if (videoReady) {
+        video.currentTime = 0;
+        updateVideo();
+      }
+    }
+
+    // Force top on load — browser restores scroller position
+    scroller.scrollTop = 0;
+    window.addEventListener('load', () => { scroller.scrollTop = 0; initVideo(); });
+
+    // Handle bfcache restore (back/forward navigation)
+    window.addEventListener('pageshow', (e) => {
+      scroller.scrollTop = 0;
+      // Re-init video — bfcache may reset video decoder state
+      videoReady = false;
+      initVideo();
+    });
+
+    // Handle tab switch — browser may stall video when tab is backgrounded
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        initVideo();
+      }
+    });
+
+    video.addEventListener('loadedmetadata', () => {
+      duration = video.duration;
+      videoReady = true;
+      video.currentTime = 0;
+    });
+
+    function updateVideo() {
+      if (!videoReady || !scroller) return;
+      const scrollH = scroller.scrollHeight - scroller.clientHeight;
+      if (scrollH <= 0) { video.currentTime = 0; return; }
+      const progress = Math.min(Math.max(scroller.scrollTop / scrollH, 0), 1);
+      const target = progress * duration;
+      if (Math.abs(video.currentTime - target) > 0.05) {
+        video.currentTime = target;
+      }
+    }
+
+    scroller.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => { updateVideo(); ticking = false; });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    window.addEventListener('resize', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => { updateVideo(); ticking = false; });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // Nav links → scroll within .page-scroller
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = link.getAttribute('href').slice(1);
+        const target = document.getElementById(id);
+        if (target && scroller) {
+          scroller.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Initial seek
+    if (video.readyState >= 1) {
+      duration = video.duration;
+      videoReady = true;
+      updateVideo();
+    }
+  })();
 </script>
 </body>
 </html>
