@@ -1,0 +1,33 @@
+# 只部署个人简历网站文件
+# 排除工作目录/素材/文档
+大运会/
+金沙面具/
+宇宙简历/
+作品集素材/
+作品集素材完整版/
+weiyiq素材/
+window/
+resume-site/
+resume-supernova/
+resume-v2/
+resume-v3-datav/
+resume-vinyl/
+.git/
+.vercel/
+
+# 排除办公文档
+*.md
+*.docx
+*.txt
+*.log
+*执行模板*
+*收口*
+*任务*
+*报价*
+*清单*
+*复盘*
+*计划*
+*文案*
+*沟通*
+聊天记录.py
+.DS_Store
